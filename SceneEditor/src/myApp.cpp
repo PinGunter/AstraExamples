@@ -42,6 +42,7 @@ void DefaultApp::init(const std::vector<Astra::Scene*>& scenes, Astra::Renderer*
 	createDescriptorSetLayout();
 	updateDescriptorSet();
 	createRtDescriptorSet();
+	updateRtDescriptorSet();
 	// pipelines
 	createPipelines();
 }
@@ -146,7 +147,6 @@ void DefaultApp::createDescriptorSetLayout()
 	_descSet = nvvk::allocateDescriptorSet(AstraDevice.getVkDevice(), _descPool, _descSetLayout);
 }
 
-// Default App
 
 void DefaultApp::updateDescriptorSet()
 {
@@ -188,7 +188,10 @@ void DefaultApp::createRtDescriptorSet()
 	allocateInfo.descriptorSetCount = 1;
 	allocateInfo.pSetLayouts = &_rtDescSetLayout;
 	vkAllocateDescriptorSets(device, &allocateInfo, &_rtDescSet);
+}
 
+void DefaultApp::updateRtDescriptorSet()
+{
 	VkAccelerationStructureKHR tlas = ((DefaultSceneRT*)_scenes[_currentScene])->getTLAS();
 	VkWriteDescriptorSetAccelerationStructureKHR descASInfo{ VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR };
 	descASInfo.accelerationStructureCount = 1;
@@ -198,14 +201,8 @@ void DefaultApp::createRtDescriptorSet()
 	std::vector<VkWriteDescriptorSet> writes;
 	writes.emplace_back(_rtDescSetLayoutBind.makeWrite(_rtDescSet, RtxBindings::eTlas, &descASInfo));
 	writes.emplace_back(_rtDescSetLayoutBind.makeWrite(_rtDescSet, RtxBindings::eOutImage, &imageInfo));
-	vkUpdateDescriptorSets(device, static_cast<uint32_t>(writes.size()), writes.data(), 0, nullptr);
-}
+	vkUpdateDescriptorSets(AstraDevice.getVkDevice(), static_cast<uint32_t>(writes.size()), writes.data(), 0, nullptr);
 
-void DefaultApp::updateRtDescriptorSet()
-{
-	VkDescriptorImageInfo imageInfo{ {}, _renderer->getOffscreenColor().descriptor.imageView, VK_IMAGE_LAYOUT_GENERAL };
-	VkWriteDescriptorSet wds = _rtDescSetLayoutBind.makeWrite(_rtDescSet, RtxBindings::eOutImage, &imageInfo);
-	vkUpdateDescriptorSets(AstraDevice.getVkDevice(), 1, &wds, 0, nullptr);
 }
 
 void DefaultApp::onResize(int w, int h)
@@ -306,6 +303,7 @@ void DefaultApp::resetScene(bool recreatePipelines)
 	createDescriptorSetLayout();
 	updateDescriptorSet();
 	createRtDescriptorSet();
+	updateRtDescriptorSet();
 
 	if (recreatePipelines)
 	{

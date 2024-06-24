@@ -6,7 +6,7 @@
 using namespace Astra;
 void BasiGui::draw(App* app)
 {
-	DefaultApp* dapp = (DefaultApp*)app;
+	DefaultApp* dapp = dynamic_cast<DefaultApp*>(app);
 	DefaultSceneRT* scene = (DefaultSceneRT*)dapp->getCurrentScene();
 
 	ImGui::Begin("Inspector");

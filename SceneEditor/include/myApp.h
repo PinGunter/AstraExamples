@@ -1,24 +1,14 @@
 #pragma once
-#include <App.h>
+#include <AppRT.h>
+#include <AppRaster.h>
 
-class DefaultApp : public Astra::App {
+
+class DefaultApp : public Astra::AppRaster, public Astra::AppRT {
 protected:
 	// raster
-	nvvk::DescriptorSetBindings _descSetLayoutBind;
-	VkDescriptorPool _descPool;
-	VkDescriptorSetLayout _descSetLayout;
-	VkDescriptorSet _descSet;
 	Astra::Pipeline* _rasterPipeline;
-
 	// rt
-	nvvk::DescriptorSetBindings _rtDescSetLayoutBind;
-	VkDescriptorPool _rtDescPool;
-	VkDescriptorSetLayout _rtDescSetLayout;
-	VkDescriptorSet _rtDescSet;
 	Astra::Pipeline* _rtPipeline;
-	std::vector<nvvk::AccelKHR> _blas;
-	std::vector<VkAccelerationStructureInstanceKHR> m_tlas;
-
 	// wireframe pipeline;
 	Astra::Pipeline* _wireframePipeline;
 	glm::vec3 wireColor;
@@ -41,8 +31,8 @@ protected:
 	void createPipelines() override;
 	void createDescriptorSetLayout() override;
 	void updateDescriptorSet() override;
-	void createRtDescriptorSet();
-	void updateRtDescriptorSet();
+	void createRtDescriptorSet() override;
+	void updateRtDescriptorSet() override;
 
 	void onResize(int w, int h) override;
 	void onMouseMotion(int x, int y) override;
@@ -51,7 +41,7 @@ protected:
 	void onKeyboard(int key, int scancode, int action, int mods) override;
 	void onFileDrop(int count, const char** paths) override;
 
-	void resetScene(bool recreatePipelines = false);
+	void resetScene(bool recreatePipelines = false) override;
 	void scheduleReset(bool recreatePipelines = false);
 
 public:
