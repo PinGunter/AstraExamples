@@ -19,7 +19,6 @@ void DefaultApp::run()
 {
 	while (!glfwWindowShouldClose(_window))
 	{
-		App::run(); // update the scene
 
 		glfwPollEvents();
 		if (isMinimized())
@@ -34,7 +33,9 @@ void DefaultApp::run()
 
 		_rendering = true;
 		auto cmdList = _renderer->beginFrame();
-		updateUBO(cmdList);
+
+		// update scene
+		_scenes[_currentScene]->update(cmdList);
 
 		// offscren render
 
@@ -66,6 +67,11 @@ void DefaultApp::run()
 			addInstanceToScene(inst);
 		}
 		_newInstances.clear();
+
+		for (auto& inst : _instToRemove) {
+			removeInstance(inst);
+		}
+		_instToRemove.clear();
 	}
 	destroy();
 }
@@ -95,43 +101,15 @@ void DefaultApp::createPipelines()
 	_pipelines = { rtPl, rasterPl, wirePl };
 }
 
-void DefaultApp::onResize(int w, int h)
-{
-	if (w == 0 || h == 0)
-		return;
-
-	if (_gui)
-	{
-		auto& imgui_io = ImGui::GetIO();
-		imgui_io.DisplaySize = ImVec2(static_cast<float>(w), static_cast<float>(h));
-	}
-
-	// wait until finishing tasks
-	AstraDevice.waitIdle();
-	AstraDevice.queueWaitIdle();
-
-	// request swapchain image
-	_renderer->requestSwapchainImage(w, h);
-
-	_scenes[_currentScene]->getCamera()->setWindowSize(w, h);
-
-	_renderer->createOffscreenRender(_alloc);
-
-	_renderer->updatePostDescriptorSet();
-	updateRtDescriptorSet();
-	updateDescriptorSet();
-
-	_renderer->createDepthBuffer();
-	_renderer->createFrameBuffers();
-}
-
 void DefaultApp::onMouseMotion(int x, int y)
 {
 	auto s = _scenes[_currentScene];
 	int delta[2] = { x - _lastMousePos[0], y - _lastMousePos[1] };
 	_lastMousePos[0] = x;
 	_lastMousePos[1] = y;
-	s->getCamera()->handleMouseInput(_mouseButtons, delta, 0, _inputMods);
+	if (!ImGui::GetIO().WantCaptureMouse) {
+		s->getCamera()->handleMouseInput(_mouseButtons, delta, 0, _inputMods);
+	}
 }
 
 void DefaultApp::onMouseButton(int button, int action, int mods)
@@ -141,7 +119,9 @@ void DefaultApp::onMouseButton(int button, int action, int mods)
 	int _[2];
 	_[0] = _[1] = 0;
 	_inputMods = mods;
-	s->getCamera()->handleMouseInput(_mouseButtons, _, 0, _inputMods);
+	if (!ImGui::GetIO().WantCaptureMouse) {
+		s->getCamera()->handleMouseInput(_mouseButtons, _, 0, _inputMods);
+	}
 }
 
 void DefaultApp::onMouseWheel(int x, int y)
@@ -149,7 +129,9 @@ void DefaultApp::onMouseWheel(int x, int y)
 	auto s = _scenes[_currentScene];
 	int _[2];
 	_[0] = _[1] = 0;
-	s->getCamera()->handleMouseInput(_mouseButtons, _, 10 * y, _inputMods);
+	if (!ImGui::GetIO().WantCaptureMouse) {
+		s->getCamera()->handleMouseInput(_mouseButtons, _, 10 * y, _inputMods);
+	}
 }
 
 void DefaultApp::onKeyboard(int key, int scancode, int action, int mods)
@@ -186,8 +168,7 @@ void DefaultApp::setCurrentSceneIndex(int i)
 
 void DefaultApp::resetScene(bool recreatePipelines)
 {
-	((Astra::DefaultSceneRT*)_scenes[_currentScene])->createBottomLevelAS();
-	((Astra::DefaultSceneRT*)_scenes[_currentScene])->createTopLevelAS();
+	_scenes[_currentScene]->reset();
 	_descSetLayoutBind.clear();
 	_rtDescSetLayoutBind.clear();
 	createDescriptorSetLayout();
@@ -200,6 +181,7 @@ void DefaultApp::resetScene(bool recreatePipelines)
 		destroyPipelines();
 		createPipelines();
 	}
+
 	_needsReset = false;
 }
 
@@ -233,6 +215,18 @@ void DefaultApp::addInstanceToScene(const Astra::MeshInstance& instance)
 	{
 		_scenes[_currentScene]->addInstance(instance);
 		resetScene();
+	}
+}
+
+void DefaultApp::removeInstance(int instance)
+{
+	if (_rendering) {
+		_instToRemove.push_back(instance);
+	}
+	else {
+		int currentTxtSize = _scenes[_currentScene]->getTextures().size();
+		_scenes[_currentScene]->removeInstance(_scenes[_currentScene]->getInstances()[instance]);
+		resetScene(_scenes[_currentScene]->getTextures().size() > currentTxtSize);
 	}
 }
 

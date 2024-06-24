@@ -5,9 +5,10 @@
 class DefaultApp : public Astra::AppRT {
 protected:
 	enum Pipeline { RT, RASTER, WIRE };
-	// models and instances to load after frame execution
+	// models and instances to load or remove after frame execution, when gpu is ready
 	std::vector< Astra::MeshInstance> _newInstances;
 	std::vector<std::pair<std::string, glm::mat4>> _newModels;
+	std::vector<int> _instToRemove;
 	bool _rendering = false;
 	bool _needsReset = false;
 	bool _fullReset = false;
@@ -20,7 +21,6 @@ protected:
 
 	void createPipelines() override;
 
-	void onResize(int w, int h) override;
 	void onMouseMotion(int x, int y) override;
 	void onMouseButton(int button, int action, int mods) override;
 	void onMouseWheel(int x, int y) override;
@@ -38,6 +38,7 @@ public:
 	// add models / instances in runtime
 	void addModelToScene(const std::string& filepath, const glm::mat4& transform = glm::mat4(1.0f));
 	void addInstanceToScene(const Astra::MeshInstance& instance);
+	void removeInstance(int instance);
 
 	void setCurrentSceneIndex(int i) override;
 

@@ -1,17 +1,20 @@
 #include <myGui.h>
 #include <myApp.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <Utils.h>
 
 using namespace Astra;
 void BasiGui::draw(App* app)
 {
 	DefaultApp* dapp = static_cast<DefaultApp*>(app);
 	DefaultSceneRT* scene = (DefaultSceneRT*)dapp->getCurrentScene();
+	ImGuiIO& io = ImGui::GetIO();
 
 	ImGui::Begin("Inspector");
 
 	if (ImGui::BeginTabBar("###Tabbar")) {
 		if (ImGui::BeginTabItem("Renderer")) {
+
 			ImGui::ColorEdit3("Clear Color", glm::value_ptr(app->getRenderer()->getClearColorRef()));
 
 			ImGui::SliderInt("Max Ray bounces", &app->getRenderer()->getMaxDepthRef(), 0, 30);
@@ -28,6 +31,7 @@ void BasiGui::draw(App* app)
 
 		}
 		if (ImGui::BeginTabItem("Performance")) {
+			ImGui::Text("Resolution: %d x %d", (int)io.DisplaySize.x, (int)io.DisplaySize.y);
 			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 			ImGui::EndTabItem();
 		}
@@ -83,16 +87,52 @@ void BasiGui::draw(App* app)
 		ImGui::Text((x + ", " + y + ", " + z).c_str());
 	}
 
-
-	if (ImGui::Checkbox("Visible", &scene->getInstances()[_node].getVisibleRef())) {
-		scene->updateTopLevelAS(_node);
-	}
+	if (!scene->getInstances().empty())
+		if (ImGui::Checkbox("Visible", &scene->getInstances()[_node].getVisibleRef())) {
+			scene->updateTopLevelAS(_node);
+		}
 
 	if (ImGui::Button("New instance")) {
 		dapp->addInstanceToScene(MeshInstance(scene->getInstances()[_node].getMeshIndex(), scene->getInstances()[_node].getTransform(), scene->getInstances()[_node].getName() + " copy" + std::to_string(_ncopies++)));
 	}
+	if (ImGui::Button("Remove instance")) {
+		if (scene->getInstances().size() == 1) {
+			// last element
+			// we cannot have an empty raytracing scene since the AS have to have something. They cant be empty
+			// we could trick it by using a 0 mask on collisisions but the memory would still be there
+			// since having no instantes is something that should not be common we are not going to allow it
+			ImGui::OpenPopup("Empty RT Scene Warning");
+		}
 
-	ImGuiIO& io = ImGui::GetIO();
+		else {
+			dapp->removeInstance(_node);
+			_node = 0;
+		}
+	}
+
+	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+	if (ImGui::BeginPopupModal("Empty RT Scene Warning", NULL, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::Text("There can't be empty scenes when using a raytracing app!");
+		ImGui::Separator();
+		ImGuiStyle& style = ImGui::GetStyle();
+		auto label = "OK";
+		float size = ImGui::CalcTextSize(label).x + 120 + style.FramePadding.x * 2.0f;
+		float avail = ImGui::GetContentRegionAvail().x;
+
+		float off = (avail - size) * 0.5;
+		if (off > 0.0f)
+			ImGui::SetCursorPosX(ImGui::GetCursorPosX() + off);
+		if (ImGui::Button(label, { 120, 0 })) { ImGui::CloseCurrentPopup(); }
+		ImGui::SetItemDefaultFocus();
+		ImGui::EndPopup();
+	}
+
+	ImGui::ShowDemoWindow();
+
+
 	ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
 	glm::mat4      proj = scene->getCamera()->getProjectionMatrix();
 	proj[1][1] *= -1;
