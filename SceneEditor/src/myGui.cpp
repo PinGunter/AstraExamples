@@ -1,12 +1,11 @@
 #include <myGui.h>
 #include <myApp.h>
 #include <glm/gtc/type_ptr.hpp>
-#include <myScene.h>
 
 using namespace Astra;
 void BasiGui::draw(App* app)
 {
-	DefaultApp* dapp = dynamic_cast<DefaultApp*>(app);
+	DefaultApp* dapp = static_cast<DefaultApp*>(app);
 	DefaultSceneRT* scene = (DefaultSceneRT*)dapp->getCurrentScene();
 
 	ImGui::Begin("Inspector");

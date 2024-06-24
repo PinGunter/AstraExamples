@@ -1,20 +1,10 @@
 #pragma once
 #include <AppRT.h>
-#include <AppRaster.h>
 
 
-class DefaultApp : public Astra::AppRaster, public Astra::AppRT {
+class DefaultApp : public Astra::AppRT {
 protected:
-	// raster
-	Astra::Pipeline* _rasterPipeline;
-	// rt
-	Astra::Pipeline* _rtPipeline;
-	// wireframe pipeline;
-	Astra::Pipeline* _wireframePipeline;
-	glm::vec3 wireColor;
-
-	int _selectedPipeline{ 0 };
-
+	enum Pipeline { RT, RASTER, WIRE };
 	// models and instances to load after frame execution
 	std::vector< Astra::MeshInstance> _newInstances;
 	std::vector<std::pair<std::string, glm::mat4>> _newModels;
@@ -29,10 +19,6 @@ protected:
 	int _inputMods{ 0 };
 
 	void createPipelines() override;
-	void createDescriptorSetLayout() override;
-	void updateDescriptorSet() override;
-	void createRtDescriptorSet() override;
-	void updateRtDescriptorSet() override;
 
 	void onResize(int w, int h) override;
 	void onMouseMotion(int x, int y) override;

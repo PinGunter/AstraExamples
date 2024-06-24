@@ -2,7 +2,7 @@
 #include <nvh/fileoperations.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <myApp.h>
-#include <myScene.h>
+#include <Scene.h>
 #include <myGui.h>
 #include <Utils.h>
 
@@ -21,13 +21,10 @@ int main(int argc, char** argv)
 
 	// App creation
 	DefaultApp app;
-	DefaultSceneRT* scene = new DefaultSceneRT();
-	DefaultSceneRT* scene2 = new DefaultSceneRT();
+	Astra::DefaultSceneRT* scene = new Astra::DefaultSceneRT();
+	Astra::DefaultSceneRT* scene2 = new Astra::DefaultSceneRT();
 	Astra::Renderer* renderer = new Astra::Renderer();
 	Astra::GuiController* gui = new BasiGui();
-
-	// Renderer creation
-	renderer->init();
 
 	// Scene creation
 	Astra::Camera cam;
