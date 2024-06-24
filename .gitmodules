@@ -1,0 +1,3 @@
+[submodule "AstraEngine"]
+	path = AstraEngine
+	url = https://github.com/PinGunter/AstraEngine
