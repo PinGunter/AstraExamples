@@ -1,6 +1,6 @@
 #include <myApp.h>
 #include <Utils.h>
-#include <WireframePL.h>
+#include <myPipelines.h>
 
 void DefaultApp::init(const std::vector<Astra::Scene*>& scenes, Astra::Renderer* renderer, Astra::GuiController* gui)
 {
@@ -43,11 +43,7 @@ void DefaultApp::run()
 		{
 			_renderer->render(cmdList, _scenes[_currentScene], _pipelines[_selectedPipeline], { _rtDescSet, _descSet }, _gui);
 		}
-		else if (_selectedPipeline == RASTER)
-		{
-			_renderer->render(cmdList, _scenes[_currentScene], _pipelines[_selectedPipeline], { _descSet }, _gui);
-		}
-		else if (_selectedPipeline == WIRE)
+		else if (_selectedPipeline == RASTER || _selectedPipeline == WIRE || _selectedPipeline == NORMALS)
 		{
 			_renderer->render(cmdList, _scenes[_currentScene], _pipelines[_selectedPipeline], { _descSet }, _gui);
 		}
@@ -76,14 +72,6 @@ void DefaultApp::run()
 	destroy();
 }
 
-void DefaultApp::destroy()
-{
-	App::destroy();
-	vkDestroyDescriptorSetLayout(AstraDevice.getVkDevice(), _descSetLayout, nullptr);
-	vkDestroyDescriptorSetLayout(AstraDevice.getVkDevice(), _rtDescSetLayout, nullptr);
-	vkDestroyDescriptorPool(AstraDevice.getVkDevice(), _rtDescPool, nullptr);
-}
-
 void DefaultApp::createPipelines()
 {
 	// raytracing pipeline
@@ -98,7 +86,11 @@ void DefaultApp::createPipelines()
 	Astra::Pipeline* wirePl = new WireframePipeline();
 	((WireframePipeline*)wirePl)->createPipeline(AstraDevice.getVkDevice(), { _descSetLayout }, _renderer->getOffscreenRenderPass());
 
-	_pipelines = { rtPl, rasterPl, wirePl };
+	// normals
+	Astra::Pipeline* normalPl = new NormalPipeline();
+	((NormalPipeline*)normalPl)->createPipeline(AstraDevice.getVkDevice(), { _descSetLayout }, _renderer->getOffscreenRenderPass());
+
+	_pipelines = { rtPl, rasterPl, wirePl, normalPl };
 }
 
 void DefaultApp::onMouseMotion(int x, int y)

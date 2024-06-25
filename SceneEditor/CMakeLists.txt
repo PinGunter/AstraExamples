@@ -18,7 +18,7 @@ _add_project_definitions(${PROJNAME})
 # GLSL to SPIR-V custom build
 compile_glsl_directory(
 	SRC "${CMAKE_CURRENT_SOURCE_DIR}/shaders" 
-	DST "${CMAKE_CURRENT_SOURCE_DIR}/spv" 
+	DST "${SPV_DIR}/${PROJNAME}/" 
 	VULKAN_TARGET "vulkan1.2"
 	DEPENDENCY ${VULKAN_BUILD_DEPENDENCIES}
 	)

@@ -21,7 +21,7 @@ int main(int argc, char** argv)
 
 	// App creation
 	DefaultApp app;
-	Astra::DefaultSceneRT* scene = new Astra::DefaultSceneRT();
+	Astra::Scene* scene = new Astra::DefaultSceneRT();
 	Astra::DefaultSceneRT* scene2 = new Astra::DefaultSceneRT();
 	Astra::Renderer* renderer = new Astra::Renderer();
 	Astra::GuiController* gui = new BasiGui();
@@ -34,6 +34,8 @@ int main(int argc, char** argv)
 
 	Astra::Light* pointLight = new Astra::PointLight(glm::vec3(1.0f), 60.0f);
 	pointLight->translate(glm::vec3(10, 15, 20));
+	Astra::Light* pointLight2 = new Astra::PointLight(glm::vec3(1.0f), 60.0f);
+	pointLight2->translate(glm::vec3(-10, 15, -20));
 
 	Astra::Light* sun = new Astra::DirectionalLight(glm::vec3(1.0f), .6f, glm::vec3(1.0f));
 	sun->translate(glm::vec3(10, 15, 20));
@@ -48,6 +50,8 @@ int main(int argc, char** argv)
 
 	scene->setCamera(camera);
 	scene->addLight(pointLight);
+	scene->addLight(pointLight2);
+	//scene->addLight(sun);
 
 	scene2->setCamera(camera2);
 	scene2->addLight(sun);
@@ -59,16 +63,16 @@ int main(int argc, char** argv)
 	scene2->loadModel(nvh::findFile("media/scenes/lizardmech.obj", defaultSearchPaths, true));
 	scene2->loadModel(nvh::findFile("media/scenes/plane2.obj", defaultSearchPaths, true));
 
-	app.init({ scene, scene2 }, renderer, gui);
 
 	try
 	{
+		app.init({ scene, scene2 }, renderer, gui);
 		app.run();
 	}
-	catch (...)
+	catch (const std::exception& exc)
 	{
 		app.destroy();
-		Astra::Log("Exception ocurred", Astra::LOG_LEVELS::ERR);
+		Astra::Log("Exception ocurred: " + std::string(exc.what()), Astra::LOG_LEVELS::ERR);
 	}
 
 	AstraDevice.destroy();
@@ -76,9 +80,10 @@ int main(int argc, char** argv)
 	delete camera;
 	delete renderer;
 	delete scene;
-	delete scene2;
+	//delete scene2;
 	delete sun;
-	delete camera2;
+	//delete camera2;
 	delete pointLight;
+	delete pointLight2;
 	delete gui;
 }

@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.9.6 FATAL_ERROR)
 project(Astra)
+
+set(SPV_DIR ${CMAKE_CURRENT_SOURCE_DIR}/spv)
+
 ## localizar el paquete nvpro_core
 if(NOT BASE_DIRECTORY)
 

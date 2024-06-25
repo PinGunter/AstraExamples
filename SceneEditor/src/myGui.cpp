@@ -17,7 +17,7 @@ void BasiGui::draw(App* app)
 
 			ImGui::ColorEdit3("Clear Color", glm::value_ptr(app->getRenderer()->getClearColorRef()));
 
-			ImGui::SliderInt("Max Ray bounces", &app->getRenderer()->getMaxDepthRef(), 0, 30);
+			ImGui::SliderInt("Max Ray bounces", &app->getRenderer()->getMaxDepthRef(), 1, 30);
 
 
 			ImGui::Separator();
@@ -26,6 +26,8 @@ void BasiGui::draw(App* app)
 			ImGui::RadioButton("RayTracing", &dapp->getSelectedPipelineRef(), 0);
 			ImGui::RadioButton("Raster", &dapp->getSelectedPipelineRef(), 1);
 			ImGui::RadioButton("Wireframe", &dapp->getSelectedPipelineRef(), 2);
+			ImGui::RadioButton("Normals", &dapp->getSelectedPipelineRef(), 3);
+
 
 			ImGui::EndTabItem();
 
@@ -95,6 +97,7 @@ void BasiGui::draw(App* app)
 	if (ImGui::Button("New instance")) {
 		dapp->addInstanceToScene(MeshInstance(scene->getInstances()[_node].getMeshIndex(), scene->getInstances()[_node].getTransform(), scene->getInstances()[_node].getName() + " copy" + std::to_string(_ncopies++)));
 	}
+	ImGui::SameLine();
 	if (ImGui::Button("Remove instance")) {
 		if (scene->getInstances().size() == 1) {
 			// last element
@@ -109,7 +112,9 @@ void BasiGui::draw(App* app)
 			_node = 0;
 		}
 	}
+	if (ImGui::Button("Add Point Light")) {
 
+	}
 	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
 

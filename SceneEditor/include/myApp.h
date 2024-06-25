@@ -4,7 +4,7 @@
 
 class DefaultApp : public Astra::AppRT {
 protected:
-	enum Pipeline { RT, RASTER, WIRE };
+	enum Pipeline { RT, RASTER, WIRE, NORMALS };
 	// models and instances to load or remove after frame execution, when gpu is ready
 	std::vector< Astra::MeshInstance> _newInstances;
 	std::vector<std::pair<std::string, glm::mat4>> _newModels;
@@ -33,7 +33,6 @@ protected:
 public:
 	void init(const std::vector< Astra::Scene*>& scenes, Astra::Renderer* renderer, Astra::GuiController* gui = nullptr) override;
 	void run() override;
-	void destroy() override;
 
 	// add models / instances in runtime
 	void addModelToScene(const std::string& filepath, const glm::mat4& transform = glm::mat4(1.0f));
