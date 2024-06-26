@@ -1,6 +1,7 @@
 #include <myApp.h>
 #include <Utils.h>
 #include <myPipelines.h>
+#include <Globals.h>
 
 void DefaultApp::init(const std::vector<Astra::Scene*>& scenes, Astra::Renderer* renderer, Astra::GuiController* gui)
 {
@@ -20,7 +21,7 @@ void DefaultApp::run()
 	while (!glfwWindowShouldClose(_window))
 	{
 
-		glfwPollEvents();
+		Astra::Input.pollEvents();
 		if (isMinimized())
 		{
 			continue;
@@ -93,43 +94,6 @@ void DefaultApp::createPipelines()
 	_pipelines = { rtPl, rasterPl, wirePl, normalPl };
 }
 
-void DefaultApp::onMouseMotion(int x, int y)
-{
-	auto s = _scenes[_currentScene];
-	int delta[2] = { x - _lastMousePos[0], y - _lastMousePos[1] };
-	_lastMousePos[0] = x;
-	_lastMousePos[1] = y;
-	if (!ImGui::GetIO().WantCaptureMouse) {
-		s->getCamera()->handleMouseInput(_mouseButtons, delta, 0, _inputMods);
-	}
-}
-
-void DefaultApp::onMouseButton(int button, int action, int mods)
-{
-	_mouseButtons[button] = action == GLFW_PRESS;
-	auto s = _scenes[_currentScene];
-	int _[2];
-	_[0] = _[1] = 0;
-	_inputMods = mods;
-	if (!ImGui::GetIO().WantCaptureMouse) {
-		s->getCamera()->handleMouseInput(_mouseButtons, _, 0, _inputMods);
-	}
-}
-
-void DefaultApp::onMouseWheel(int x, int y)
-{
-	auto s = _scenes[_currentScene];
-	int _[2];
-	_[0] = _[1] = 0;
-	if (!ImGui::GetIO().WantCaptureMouse) {
-		s->getCamera()->handleMouseInput(_mouseButtons, _, 10 * y, _inputMods);
-	}
-}
-
-void DefaultApp::onKeyboard(int key, int scancode, int action, int mods)
-{
-	// pass;
-}
 
 void DefaultApp::onFileDrop(int count, const char** paths)
 {

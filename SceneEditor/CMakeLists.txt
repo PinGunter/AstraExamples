@@ -21,31 +21,32 @@ compile_glsl_directory(
 	DST "${SPV_DIR}/${PROJNAME}/" 
 	VULKAN_TARGET "vulkan1.2"
 	DEPENDENCY ${VULKAN_BUILD_DEPENDENCIES}
-	)
-	target_link_libraries(${PROJNAME} AstraCore) 
+	
+)
+target_link_libraries(${PROJNAME} AstraCore) 
 
-	#--------------------------------------------------------------------------------------------------
-	# Sources
-	target_sources(${PROJNAME} PUBLIC ${SOURCE_FILES} ${HEADER_FILES})
-	target_sources(${PROJNAME} PUBLIC ${COMMON_SOURCE_FILES})
-	target_sources(${PROJNAME} PUBLIC ${PACKAGE_SOURCE_FILES})
-	target_sources(${PROJNAME} PUBLIC ${GLSL_SOURCES} ${GLSL_HEADERS})
+#--------------------------------------------------------------------------------------------------
+# Sources
+target_sources(${PROJNAME} PUBLIC ${SOURCE_FILES} ${HEADER_FILES})
+target_sources(${PROJNAME} PUBLIC ${COMMON_SOURCE_FILES})
+target_sources(${PROJNAME} PUBLIC ${PACKAGE_SOURCE_FILES})
+target_sources(${PROJNAME} PUBLIC ${GLSL_SOURCES} ${GLSL_HEADERS})
 	
 	
-	#--------------------------------------------------------------------------------------------------
-	# Linkage
-	#
-	target_link_libraries(${PROJNAME} ${PLATFORM_LIBRARIES} nvpro_core)
+#--------------------------------------------------------------------------------------------------
+# Linkage
+#
+target_link_libraries(${PROJNAME} ${PLATFORM_LIBRARIES} nvpro_core)
 	
-	foreach(DEBUGLIB ${LIBRARIES_DEBUG})
-	  target_link_libraries(${PROJNAME} debug ${DEBUGLIB})
-	endforeach(DEBUGLIB)
+foreach(DEBUGLIB ${LIBRARIES_DEBUG})
+	target_link_libraries(${PROJNAME} debug ${DEBUGLIB})
+endforeach(DEBUGLIB)
 	
-	foreach(RELEASELIB ${LIBRARIES_OPTIMIZED})
-	  target_link_libraries(${PROJNAME} optimized ${RELEASELIB})
-	endforeach(RELEASELIB)
+foreach(RELEASELIB ${LIBRARIES_OPTIMIZED})
+	target_link_libraries(${PROJNAME} optimized ${RELEASELIB})
+endforeach(RELEASELIB)
 	
-	#--------------------------------------------------------------------------------------------------
-	# copies binaries that need to be put next to the exe files (ZLib, etc.)
-	#
-	_finalize_target( ${PROJNAME} )
+#--------------------------------------------------------------------------------------------------
+# copies binaries that need to be put next to the exe files (ZLib, etc.)
+#
+_finalize_target( ${PROJNAME} )

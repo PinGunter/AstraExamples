@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 
 	// Scene creation
 	Astra::Camera cam;
-	Astra::CameraController* camera = new Astra::OrbitCameraController(cam);
+	Astra::CameraController* camera = new Astra::FPSCameraController(cam);
 	Astra::Camera cam2;
 	Astra::CameraController* camera2 = new Astra::OrbitCameraController(cam2);
 

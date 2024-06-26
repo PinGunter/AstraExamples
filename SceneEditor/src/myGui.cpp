@@ -50,6 +50,7 @@ void BasiGui::draw(App* app)
 	if (ImGui::Button("Switch")) {
 		app->setCurrentSceneIndex((app->getCurrentSceneIndex() + 1) % 2);
 		_node = 0;
+		_light = 0;
 	}
 
 	if (ImGui::BeginListBox("Instances")) {
@@ -75,18 +76,20 @@ void BasiGui::draw(App* app)
 		}
 		ImGui::EndListBox();
 	}
+	if (!scene->getLights().empty()) {
 
-	auto light = scene->getLights()[_light];
-	auto lightType = light->getType();
-	ImGui::ColorEdit3("Light Color", glm::value_ptr(light->getColorRef()));
-	ImGui::SliderFloat("Intensity", &light->getIntensityRef(), 0.0f, lightType == DIRECTIONAL ? 1.0f : 100.0f);
-	ImGui::Text((std::string("Light Type: ") + std::to_string(light->getType())).c_str());
-	if (lightType == LightType::DIRECTIONAL) {
-		std::string x = std::to_string(((Astra::DirectionalLight*)light)->getDirection().x);
-		std::string y = std::to_string(((Astra::DirectionalLight*)light)->getDirection().y);
-		std::string z = std::to_string(((Astra::DirectionalLight*)light)->getDirection().z);
+		auto light = scene->getLights()[_light];
+		auto lightType = light->getType();
+		ImGui::ColorEdit3("Light Color", glm::value_ptr(light->getColorRef()));
+		ImGui::SliderFloat("Intensity", &light->getIntensityRef(), 0.0f, lightType == DIRECTIONAL ? 1.0f : 100.0f);
+		ImGui::Text((std::string("Light Type: ") + std::to_string(light->getType())).c_str());
+		if (lightType == LightType::DIRECTIONAL) {
+			std::string x = std::to_string(((Astra::DirectionalLight*)light)->getDirection().x);
+			std::string y = std::to_string(((Astra::DirectionalLight*)light)->getDirection().y);
+			std::string z = std::to_string(((Astra::DirectionalLight*)light)->getDirection().z);
 
-		ImGui::Text((x + ", " + y + ", " + z).c_str());
+			ImGui::Text((x + ", " + y + ", " + z).c_str());
+		}
 	}
 
 	if (!scene->getInstances().empty())
@@ -113,7 +116,13 @@ void BasiGui::draw(App* app)
 		}
 	}
 	if (ImGui::Button("Add Point Light")) {
-
+		auto newLight = new PointLight(glm::vec3(1.0f), 60);
+		scene->addLight(newLight);
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Remove Light")) {
+		scene->removeLight(scene->getLights()[_light]);
+		_light = 0;
 	}
 	ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 	ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
@@ -157,11 +166,12 @@ void BasiGui::draw(App* app)
 			}
 		}
 		else {
-			ImGuizmo::Manipulate(glm::value_ptr(scene->getCamera()->getViewMatrix()),
-				glm::value_ptr(proj),
-				ImGuizmo::OPERATION::UNIVERSAL,
-				ImGuizmo::LOCAL,
-				glm::value_ptr(app->getCurrentScene()->getLights()[_light]->getTransformRef()));
+			if (!scene->getLights().empty())
+				ImGuizmo::Manipulate(glm::value_ptr(scene->getCamera()->getViewMatrix()),
+					glm::value_ptr(proj),
+					ImGuizmo::OPERATION::TRANSLATE,
+					ImGuizmo::LOCAL,
+					glm::value_ptr(app->getCurrentScene()->getLights()[_light]->getTransformRef()));
 		}
 	ImGui::End();
 

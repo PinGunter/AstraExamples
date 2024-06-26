@@ -13,18 +13,8 @@ protected:
 	bool _needsReset = false;
 	bool _fullReset = false;
 
-
-	// camera and input controls
-	bool _mouseButtons[3] = { 0 };
-	int _lastMousePos[2] = { 0 };
-	int _inputMods{ 0 };
-
 	void createPipelines() override;
 
-	void onMouseMotion(int x, int y) override;
-	void onMouseButton(int button, int action, int mods) override;
-	void onMouseWheel(int x, int y) override;
-	void onKeyboard(int key, int scancode, int action, int mods) override;
 	void onFileDrop(int count, const char** paths) override;
 
 	void resetScene(bool recreatePipelines = false) override;
