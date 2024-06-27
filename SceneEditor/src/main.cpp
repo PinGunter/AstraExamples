@@ -21,8 +21,8 @@ int main(int argc, char** argv)
 
 	// App creation
 	DefaultApp app;
-	Astra::Scene* scene = new Astra::DefaultSceneRT();
-	Astra::DefaultSceneRT* scene2 = new Astra::DefaultSceneRT();
+	Astra::Scene* scene = new Astra::SceneRT();
+	Astra::SceneRT* scene2 = new Astra::SceneRT();
 	Astra::Renderer* renderer = new Astra::Renderer();
 	Astra::GuiController* gui = new BasiGui();
 
