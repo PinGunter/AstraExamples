@@ -18,7 +18,7 @@ void DefaultApp::init(const std::vector<Astra::Scene*>& scenes, Astra::Renderer*
 
 void DefaultApp::run()
 {
-	while (!glfwWindowShouldClose(_window))
+	while (!Astra::Input.windowShouldClose())
 	{
 
 		Astra::Input.pollEvents();
@@ -77,19 +77,19 @@ void DefaultApp::createPipelines()
 {
 	// raytracing pipeline
 	Astra::Pipeline* rtPl = new Astra::RayTracingPipeline();
-	((Astra::RayTracingPipeline*)rtPl)->createPipeline(AstraDevice.getVkDevice(), { _rtDescSetLayout, _descSetLayout }, _alloc);
+	((Astra::RayTracingPipeline*)rtPl)->create(AstraDevice.getVkDevice(), { _rtDescSetLayout, _descSetLayout }, _alloc);
 
 	// basic raster
 	Astra::Pipeline* rasterPl = new Astra::OffscreenRaster();
-	((Astra::OffscreenRaster*)rasterPl)->createPipeline(AstraDevice.getVkDevice(), { _descSetLayout }, _renderer->getOffscreenRenderPass());
+	((Astra::OffscreenRaster*)rasterPl)->create(AstraDevice.getVkDevice(), { _descSetLayout }, _renderer->getOffscreenRenderPass());
 
 	// wireframe
 	Astra::Pipeline* wirePl = new WireframePipeline();
-	((WireframePipeline*)wirePl)->createPipeline(AstraDevice.getVkDevice(), { _descSetLayout }, _renderer->getOffscreenRenderPass());
+	((WireframePipeline*)wirePl)->create(AstraDevice.getVkDevice(), { _descSetLayout }, _renderer->getOffscreenRenderPass());
 
 	// normals
 	Astra::Pipeline* normalPl = new NormalPipeline();
-	((NormalPipeline*)normalPl)->createPipeline(AstraDevice.getVkDevice(), { _descSetLayout }, _renderer->getOffscreenRenderPass());
+	((NormalPipeline*)normalPl)->create(AstraDevice.getVkDevice(), { _descSetLayout }, _renderer->getOffscreenRenderPass());
 
 	_pipelines = { rtPl, rasterPl, wirePl, normalPl };
 }
@@ -114,10 +114,10 @@ void DefaultApp::onFileDrop(int count, const char** paths)
 
 void DefaultApp::setCurrentSceneIndex(int i)
 {
-	int nbTxt = _scenes[_currentScene]->getTextures().size();
 	Astra::App::setCurrentSceneIndex(i);
 	if (_status == Astra::AppStatus::Running)
 	{
+		int nbTxt = _scenes[_currentScene]->getTextures().size();
 		scheduleReset(nbTxt != _scenes[_currentScene]->getTextures().size());
 	}
 }

@@ -28,15 +28,16 @@ int main(int argc, char** argv)
 
 	// Scene creation
 	Astra::Camera cam;
-	Astra::CameraController* camera = new Astra::FPSCameraController(cam);
+	Astra::CameraController* camera = new Astra::FreeCameraController(cam);
 	Astra::Camera cam2;
 	Astra::CameraController* camera2 = new Astra::OrbitCameraController(cam2);
 
 	Astra::Light* pointLight = new Astra::PointLight(glm::vec3(1.0f), 60.0f);
 	pointLight->translate(glm::vec3(10, 15, 20));
+	pointLight->setColor(glm::vec3(1, 0.7, 0.7));
 	Astra::Light* pointLight2 = new Astra::PointLight(glm::vec3(1.0f), 60.0f);
 	pointLight2->translate(glm::vec3(-10, 15, -20));
-
+	pointLight2->setColor(glm::vec3(0.7, 0.7, 1));
 	Astra::Light* sun = new Astra::DirectionalLight(glm::vec3(1.0f), .6f, glm::vec3(1.0f));
 	sun->translate(glm::vec3(10, 15, 20));
 
@@ -47,6 +48,7 @@ int main(int argc, char** argv)
 
 	camera2->setWindowSize(windowSize[0], windowSize[1]);
 	camera2->setLookAt(glm::vec3(5.0f), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	camera2->setFov(30);
 
 	scene->setCamera(camera);
 	scene->addLight(pointLight);
@@ -57,12 +59,11 @@ int main(int argc, char** argv)
 	scene2->addLight(sun);
 
 	scene->loadModel(nvh::findFile("media/scenes/mono2.obj", defaultSearchPaths, true));
-	scene->loadModel(nvh::findFile("media/scenes/espejo.obj", defaultSearchPaths, true));
+	scene->loadModel(nvh::findFile("media/scenes/espejo.obj", defaultSearchPaths, true), glm::rotate(glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(2.0f)), glm::vec3(-3, 2, -3)), -glm::pi<float>() / 4.0f, glm::vec3(0, 1, 0)));
 	scene->loadModel(nvh::findFile("media/scenes/plane2.obj", defaultSearchPaths, true), glm::translate(glm::mat4(1.0f), glm::vec3(0, -1, 0)));
 
-	scene2->loadModel(nvh::findFile("media/scenes/lizardmech.obj", defaultSearchPaths, true));
+	scene2->loadModel(nvh::findFile("media/scenes/cube.obj", defaultSearchPaths, true), glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.5, 0)));
 	scene2->loadModel(nvh::findFile("media/scenes/plane2.obj", defaultSearchPaths, true));
-
 
 	try
 	{

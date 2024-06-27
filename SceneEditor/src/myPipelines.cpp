@@ -5,7 +5,7 @@
 #include <host_device.h>
 
 
-void WireframePipeline::createPipeline(VkDevice vkdev, const std::vector<VkDescriptorSetLayout>& descsetsLayouts, VkRenderPass rp)
+void WireframePipeline::create(VkDevice vkdev, const std::vector<VkDescriptorSetLayout>& descsetsLayouts, VkRenderPass rp)
 {
 	std::vector<std::string> defaultSearchPaths = {
 	NVPSystem::exePath() + PROJECT_RELDIRECTORY,
@@ -39,7 +39,7 @@ void WireframePipeline::createPipeline(VkDevice vkdev, const std::vector<VkDescr
 }
 
 
-void NormalPipeline::createPipeline(VkDevice vkdev, const std::vector<VkDescriptorSetLayout>& descsetsLayouts, VkRenderPass rp)
+void NormalPipeline::create(VkDevice vkdev, const std::vector<VkDescriptorSetLayout>& descsetsLayouts, VkRenderPass rp)
 {
 	std::vector<std::string> defaultSearchPaths = {
 	NVPSystem::exePath() + PROJECT_RELDIRECTORY,
