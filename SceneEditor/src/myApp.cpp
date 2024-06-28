@@ -123,20 +123,7 @@ void DefaultApp::setCurrentSceneIndex(int i)
 
 void DefaultApp::resetScene(bool recreatePipelines)
 {
-	_scenes[_currentScene]->reset();
-	_descSetLayoutBind.clear();
-	_rtDescSetLayoutBind.clear();
-	createDescriptorSetLayout();
-	updateDescriptorSet();
-	createRtDescriptorSetLayout();
-	updateRtDescriptorSet();
-
-	if (recreatePipelines)
-	{
-		destroyPipelines();
-		createPipelines();
-	}
-
+	Astra::AppRT::resetScene(recreatePipelines);
 	_needsReset = false;
 }
 
