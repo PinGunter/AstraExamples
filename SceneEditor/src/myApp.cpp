@@ -117,8 +117,7 @@ void DefaultApp::setCurrentSceneIndex(int i)
 	Astra::App::setCurrentSceneIndex(i);
 	if (_status == Astra::AppStatus::Running)
 	{
-		int nbTxt = _scenes[_currentScene]->getTextures().size();
-		scheduleReset(nbTxt != _scenes[_currentScene]->getTextures().size());
+		scheduleReset(true);
 	}
 }
 
@@ -157,7 +156,7 @@ void DefaultApp::addModelToScene(const std::string& filepath, const glm::mat4& t
 	{
 		int currentTxtSize = _scenes[_currentScene]->getTextures().size();
 		_scenes[_currentScene]->loadModel(filepath, transform);
-		resetScene(_scenes[_currentScene]->getTextures().size() > currentTxtSize);
+		resetScene(_scenes[_currentScene]->getTextures().size() != currentTxtSize);
 	}
 }
 
@@ -182,7 +181,7 @@ void DefaultApp::removeInstance(int instance)
 	else {
 		int currentTxtSize = _scenes[_currentScene]->getTextures().size();
 		_scenes[_currentScene]->removeInstance(_scenes[_currentScene]->getInstances()[instance]);
-		resetScene(_scenes[_currentScene]->getTextures().size() > currentTxtSize);
+		resetScene(_scenes[_currentScene]->getTextures().size() != currentTxtSize);
 	}
 }
 

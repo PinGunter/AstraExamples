@@ -58,12 +58,12 @@ int main(int argc, char** argv)
 	scene2->setCamera(camera2);
 	scene2->addLight(sun);
 
-	scene->loadModel(nvh::findFile("media/scenes/mono2.obj", defaultSearchPaths, true));
-	scene->loadModel(nvh::findFile("media/scenes/espejo.obj", defaultSearchPaths, true), glm::rotate(glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(2.0f)), glm::vec3(-3, 2, -3)), -glm::pi<float>() / 4.0f, glm::vec3(0, 1, 0)));
-	scene->loadModel(nvh::findFile("media/scenes/plane2.obj", defaultSearchPaths, true), glm::translate(glm::mat4(1.0f), glm::vec3(0, -1, 0)));
+	scene->loadModel(nvh::findFile("assets/mono2.obj", defaultSearchPaths, true));
+	scene->loadModel(nvh::findFile("assets/espejo.obj", defaultSearchPaths, true), glm::rotate(glm::translate(glm::scale(glm::mat4(1.0f), glm::vec3(2.0f)), glm::vec3(-3, 2, -3)), -glm::pi<float>() / 4.0f, glm::vec3(0, 1, 0)));
+	scene->loadModel(nvh::findFile("assets/plane2.obj", defaultSearchPaths, true), glm::translate(glm::mat4(1.0f), glm::vec3(0, -1, 0)));
 
-	scene2->loadModel(nvh::findFile("media/scenes/cube.obj", defaultSearchPaths, true), glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.5, 0)));
-	scene2->loadModel(nvh::findFile("media/scenes/plane2.obj", defaultSearchPaths, true));
+	scene2->loadModel(nvh::findFile("assets/cube.obj", defaultSearchPaths, true), glm::translate(glm::mat4(1.0f), glm::vec3(0, 0.5, 0)));
+	scene2->loadModel(nvh::findFile("assets/plane2.obj", defaultSearchPaths, true));
 
 	try
 	{
