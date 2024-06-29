@@ -21,7 +21,6 @@ protected:
 	void scheduleReset(bool recreatePipelines = false);
 
 public:
-	void init(const std::vector< Astra::Scene*>& scenes, Astra::Renderer* renderer, Astra::GuiController* gui = nullptr) override;
 	void run() override;
 
 	// add models / instances in runtime
@@ -30,6 +29,4 @@ public:
 	void removeInstance(int instance);
 
 	void setCurrentSceneIndex(int i) override;
-
-	int& getSelectedPipelineRef();
 };

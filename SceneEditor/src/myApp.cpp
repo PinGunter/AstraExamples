@@ -3,18 +3,6 @@
 #include <myPipelines.h>
 #include <Globals.h>
 
-void DefaultApp::init(const std::vector<Astra::Scene*>& scenes, Astra::Renderer* renderer, Astra::GuiController* gui)
-{
-	// init base app, copies scenes renderer and gui
-	// also inits the scenes and sets callbacks
-	Astra::AppRT::init(scenes, renderer, gui);
-
-	// Scene -> GPU information || Uniforms
-	// camera uniforms
-	//createUBO();
-
-	createPipelines();
-}
 
 void DefaultApp::run()
 {
@@ -170,9 +158,4 @@ void DefaultApp::removeInstance(int instance)
 		_scenes[_currentScene]->removeInstance(_scenes[_currentScene]->getInstances()[instance]);
 		resetScene(_scenes[_currentScene]->getTextures().size() != currentTxtSize);
 	}
-}
-
-int& DefaultApp::getSelectedPipelineRef()
-{
-	return _selectedPipeline;
 }

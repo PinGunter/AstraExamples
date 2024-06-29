@@ -1,9 +1,12 @@
-newmtl  cube_instance_material
-illum 2
-d 1 
-Ns 8.0 
-Ni 0 
-Ka 0 0 0
-Kd 1 1 1
-Ks 1 1 1
+# Blender 4.0.0 MTL File: 'None'
+# www.blender.org
 
+newmtl Material.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
