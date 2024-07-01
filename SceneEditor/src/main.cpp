@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 	Astra::Camera cam;
 	Astra::CameraController* camera = new Astra::FreeCameraController(cam);
 	Astra::Camera cam2;
-	Astra::CameraController* camera2 = new Astra::OrbitCameraController(cam2);
+	Astra::CameraController* camera2 = new Astra::FreeCameraController(cam2);
 
 	Astra::Light* pointLight = new Astra::PointLight(glm::vec3(1.0f), 60.0f);
 	pointLight->translate(glm::vec3(10, 15, 20));

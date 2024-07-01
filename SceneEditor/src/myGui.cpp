@@ -2,43 +2,129 @@
 #include <myApp.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <Utils.h>
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include <imgui_internal.h>
+#include <implot.h>
+
 
 using namespace Astra;
+void BasiGui::startDockableWindow()
+{
+	// Keeping the unique ID of the dock space
+	auto dockspaceID = ImGui::GetID("DockSpace");
+
+	// The dock need a dummy window covering the entire viewport.
+	ImGuiViewport* viewport = ImGui::GetMainViewport();
+	ImGui::SetNextWindowPos(viewport->WorkPos);
+	ImGui::SetNextWindowSize(viewport->WorkSize);
+	ImGui::SetNextWindowViewport(viewport->ID);
+
+	// All flags to dummy window
+	ImGuiWindowFlags host_window_flags = 0;
+	host_window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize;
+	host_window_flags |= ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoDocking;
+	host_window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+	host_window_flags |= ImGuiWindowFlags_NoBackground;
+
+	// Starting dummy window
+	char label[32];
+	ImFormatString(label, IM_ARRAYSIZE(label), "DockSpaceViewport_%08X", viewport->ID);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	ImGui::Begin(label, nullptr, host_window_flags);
+	ImGui::PopStyleVar(3);
+
+	// The central node is transparent, so that when UI is draw after, the image is visible
+	// Auto Hide Bar, no title of the panel
+	// Center is not dockable, that is for the scene
+	ImGuiDockNodeFlags dockspaceFlags = ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_AutoHideTabBar
+		| ImGuiDockNodeFlags_NoDockingOverCentralNode;
+
+	// Building the splitting of the dock space is done only once
+	if (!ImGui::DockBuilderGetNode(dockspaceID))
+	{
+		ImGui::DockBuilderRemoveNode(dockspaceID);
+		ImGui::DockBuilderAddNode(dockspaceID, dockspaceFlags | ImGuiDockNodeFlags_DockSpace);
+		ImGui::DockBuilderSetNodeSize(dockspaceID, viewport->Size);
+
+		ImGuiID dock_main_id = dockspaceID;
+
+		// Slitting all 4 directions, targetting (320 pixel * DPI) panel width, (180 pixel * DPI) panel height.
+		const float xRatio = glm::clamp<float>(180.0f / viewport->WorkSize[0], 0.01f, 0.499f);
+		const float yRatio = glm::clamp<float>(180.0f / viewport->WorkSize[1], 0.01f, 0.499f);
+		ImGuiID     id_left, id_right, id_up, id_down;
+
+		// Note, for right, down panels, we use the n / (1 - n) formula to correctly split the space remaining from the left, up panels.
+		id_left = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, xRatio, nullptr, &dock_main_id);
+		id_right = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, xRatio / (1 - xRatio), nullptr, &dock_main_id);
+		id_up = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Up, yRatio, nullptr, &dock_main_id);
+		id_down = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, yRatio / (1 - yRatio), nullptr, &dock_main_id);
+
+		ImGui::DockBuilderDockWindow("Dock_left", id_left);
+		ImGui::DockBuilderDockWindow("Dock_right", id_right);
+		ImGui::DockBuilderDockWindow("Dock_up", id_up);
+		ImGui::DockBuilderDockWindow("Dock_down", id_down);
+		ImGui::DockBuilderDockWindow("Scene", dock_main_id);  // Center
+
+		ImGui::DockBuilderFinish(dock_main_id);
+	}
+
+	// Setting the panel to blend with alpha
+	ImVec4 col = ImGui::GetStyleColorVec4(ImGuiCol_WindowBg);
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(col.x, col.y, col.z, 0.8f));
+
+	ImGui::DockSpace(dockspaceID, ImVec2(0.0f, 0.0f), dockspaceFlags);
+	ImGui::PopStyleColor();
+	ImGui::End();
+
+	// The panel
+	//if (alpha < 1)
+	ImGui::SetNextWindowBgAlpha(0.8f);  // For when the panel becomes a floating window
+
+}
+
 void BasiGui::draw(App* app)
 {
 	DefaultApp* dapp = static_cast<DefaultApp*>(app);
 	SceneRT* scene = (SceneRT*)dapp->getCurrentScene();
 	ImGuiIO& io = ImGui::GetIO();
 
-	ImGui::Begin("Inspector");
+	startDockableWindow();
 
-	if (ImGui::BeginTabBar("###Tabbar")) {
-		if (ImGui::BeginTabItem("Renderer")) {
-
-			ImGui::ColorEdit3("Clear Color", glm::value_ptr(app->getRenderer()->getClearColorRef()));
-
-			ImGui::SliderInt("Max Ray bounces", &app->getRenderer()->getMaxDepthRef(), 1, 30);
+	ImGui::Begin("Renderer");
 
 
-			ImGui::Separator();
+	ImGui::ColorEdit3("Clear Color", glm::value_ptr(app->getRenderer()->getClearColorRef()));
 
-			ImGui::Text("Select rendering pipeline");
-			ImGui::RadioButton("RayTracing", &dapp->getSelectedPipelineRef(), 0);
-			ImGui::RadioButton("Raster", &dapp->getSelectedPipelineRef(), 1);
-			ImGui::RadioButton("Wireframe", &dapp->getSelectedPipelineRef(), 2);
-			ImGui::RadioButton("Normals", &dapp->getSelectedPipelineRef(), 3);
+	ImGui::SliderInt("Max Ray bounces", &app->getRenderer()->getMaxDepthRef(), 1, 30);
 
 
-			ImGui::EndTabItem();
+	ImGui::Separator();
 
-		}
-		if (ImGui::BeginTabItem("Performance")) {
-			ImGui::Text("Resolution: %d x %d", (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-			ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			ImGui::EndTabItem();
-		}
-		ImGui::EndTabBar();
+	ImGui::Text("Select rendering pipeline");
+	ImGui::RadioButton("RayTracing", &dapp->getSelectedPipelineRef(), 0);
+	ImGui::RadioButton("Raster", &dapp->getSelectedPipelineRef(), 1);
+	ImGui::RadioButton("Wireframe", &dapp->getSelectedPipelineRef(), 2);
+	ImGui::RadioButton("Normals", &dapp->getSelectedPipelineRef(), 3);
+
+
+	ImGui::End();
+
+	ImGui::Begin("Performance");
+	ImGui::Text("Resolution: %d x %d", (int)io.DisplaySize.x, (int)io.DisplaySize.y);
+	ImGui::Text("Frame time %.3f ms/frame", dapp->getFrameTime());
+	ImGui::Text((std::string("Recording stats: ") + (dapp->getRecordingStats() ? "Yes" : "No")).c_str());
+
+	if (ImGui::Button(
+		(std::string((dapp->getRecordingStats()) ? "Stop" : "Start") + " tracking stats").c_str()
+	)) {
+		dapp->setRecordingStats(!dapp->getRecordingStats());
 	}
+	if (ImGui::Button("Save stats")) {
+		dapp->saveStats();
+	}
+
 
 	ImGui::End();
 
@@ -144,8 +230,6 @@ void BasiGui::draw(App* app)
 		ImGui::EndPopup();
 	}
 
-	ImGui::ShowDemoWindow();
-
 
 	ImGuizmo::SetRect(0, 0, io.DisplaySize.x, io.DisplaySize.y);
 	glm::mat4      proj = scene->getCamera()->getProjectionMatrix();
@@ -177,3 +261,4 @@ void BasiGui::draw(App* app)
 
 
 }
+

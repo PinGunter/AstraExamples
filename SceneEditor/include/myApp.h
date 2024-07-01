@@ -20,6 +20,16 @@ protected:
 	void resetScene(bool recreatePipelines = false) override;
 	void scheduleReset(bool recreatePipelines = false);
 
+	float _frameTime;
+	bool _recordingStats = false;
+	bool _shadows = false, _reflections = false, _refraction = false;
+
+	std::vector<float> _ftArray;
+
+	void computeStats(int& triCount, float& avgFrameTime);
+	void saveRtStats();
+	void saveRasterStats();
+
 public:
 	void run() override;
 
@@ -29,4 +39,16 @@ public:
 	void removeInstance(int instance);
 
 	void setCurrentSceneIndex(int i) override;
+
+	float getFrameTime();
+
+
+	bool getRecordingStats();
+	void setRecordingStats(bool b);
+	bool& getUsingShadowsRef();
+	bool& getUsingReflectionRef();
+	bool& getUsingRefractionRef();
+
+	void saveStats();
+
 };

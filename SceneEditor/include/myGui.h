@@ -7,6 +7,7 @@ class BasiGui : public Astra::GuiController {
 	int _light{ 0 };
 	int _ncopies{ 1 };
 	bool _handlingNodes{ true };
+	void startDockableWindow();
 public:
 	void draw(Astra::App* app) override;
 };
