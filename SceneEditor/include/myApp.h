@@ -22,13 +22,13 @@ protected:
 
 	float _frameTime;
 	bool _recordingStats = false;
-	bool _shadows = false, _reflections = false, _refraction = false;
 
 	std::vector<float> _ftArray;
 
-	void computeStats(int& triCount, float& avgFrameTime);
+	void computeStats(int& triCount, int& lightCount, float& avgFrameTime);
 	void saveRtStats();
 	void saveRasterStats();
+	void onKeyboard(int key, int scancode, int action, int mods) override;
 
 public:
 	void run() override;
@@ -46,8 +46,6 @@ public:
 	bool getRecordingStats();
 	void setRecordingStats(bool b);
 	bool& getUsingShadowsRef();
-	bool& getUsingReflectionRef();
-	bool& getUsingRefractionRef();
 
 	void saveStats();
 

@@ -5,10 +5,11 @@
 #include <fstream>
 #include <filesystem>
 
-void DefaultApp::computeStats(int& triCount, float& avgFrameTime)
+void DefaultApp::computeStats(int& triCount, int& lightCount, float& avgFrameTime)
 {
 	triCount = 0;
 	avgFrameTime = 0;
+	lightCount = _scenes[_currentScene]->getLights().size();
 	for (auto ft : _ftArray) {
 		avgFrameTime += ft;
 	}
@@ -144,15 +145,15 @@ void DefaultApp::saveRtStats()
 	file << "RayTracing Stats" << std::endl;
 
 	float avg;
-	int triCount;
-	computeStats(triCount, avg);
+	int triCount, nLights;
+	computeStats(triCount, nLights, avg);
 	auto windowSize = AstraDevice.getWindowSize();
 	file << "Resolution: " << windowSize[0] << " x " << windowSize[1] << std::endl;
 	file << "Average Frame Time (ms): " << avg << std::endl;
 	file << "Triangle Count: " << triCount << std::endl;
-	file << "Raytraced shadows: " << (_shadows ? "Yes" : "No") << std::endl;
-	file << "Raytraced reflections: " << (_reflections ? "Yes" : "No") << std::endl;
-	file << "Raytraced refraction: " << (_refraction ? "Yes" : "No") << std::endl;
+	file << "Number of lights: " << nLights << std::endl;
+	file << "Raytraced shadows: " << (_renderer->getUseShadows() ? "Yes" : "No") << std::endl;
+	file << "Raytraced reflections and refractions: " << _renderer->getMaxDepth() << " ray bounces" << std::endl;
 
 	file << "============RAW FRAME TIME DATA==============" << std::endl;
 	for (auto ft : _ftArray) {
@@ -168,17 +169,25 @@ void DefaultApp::saveRasterStats()
 	file << "Raster Stats" << std::endl;
 
 	float avg;
-	int triCount;
-	computeStats(triCount, avg);
+	int triCount, nLights;
+	computeStats(triCount, nLights, avg);
 	auto windowSize = AstraDevice.getWindowSize();
 	file << "Resolution: " << windowSize[0] << " x " << windowSize[1] << std::endl;
 	file << "Average Frame Time (ms): " << avg << std::endl;
 	file << "Triangle Count: " << triCount << std::endl;
+	file << "Number of lights: " << nLights << std::endl;
 	file << "============RAW FRAME TIME DATA==============" << std::endl;
 	for (auto ft : _ftArray) {
 		file << ft << std::endl;
 	}
 	file.close();
+}
+
+void DefaultApp::onKeyboard(int key, int scancode, int action, int mods)
+{
+	if (key == Astra::Keys::Key_Escape) {
+		Astra::Input.setWindowShouldClose(true);
+	}
 }
 
 bool DefaultApp::getRecordingStats()
@@ -193,21 +202,6 @@ void DefaultApp::setRecordingStats(bool b)
 	{
 		_ftArray.clear();
 	}
-}
-
-bool& DefaultApp::getUsingShadowsRef()
-{
-	return _shadows;
-}
-
-bool& DefaultApp::getUsingReflectionRef()
-{
-	return _reflections;
-}
-
-bool& DefaultApp::getUsingRefractionRef()
-{
-	return _refraction;
 }
 
 void DefaultApp::saveStats()

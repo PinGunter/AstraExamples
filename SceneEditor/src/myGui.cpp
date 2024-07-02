@@ -98,7 +98,7 @@ void BasiGui::draw(App* app)
 	ImGui::ColorEdit3("Clear Color", glm::value_ptr(app->getRenderer()->getClearColorRef()));
 
 	ImGui::SliderInt("Max Ray bounces", &app->getRenderer()->getMaxDepthRef(), 1, 30);
-
+	ImGui::Checkbox("Raytraced shadows", &app->getRenderer()->getUseShadowsRef());
 
 	ImGui::Separator();
 
@@ -150,34 +150,6 @@ void BasiGui::draw(App* app)
 		}
 		ImGui::EndListBox();
 	}
-
-	if (ImGui::BeginListBox("Lights")) {
-
-		for (int i = 0; i < scene->getLights().size(); i++) {
-			auto light = scene->getLights()[i];
-			if (ImGui::Selectable(light->getName().c_str(), i == _light)) {
-				_light = i;
-				_handlingNodes = false;
-			}
-		}
-		ImGui::EndListBox();
-	}
-	if (!scene->getLights().empty()) {
-
-		auto light = scene->getLights()[_light];
-		auto lightType = light->getType();
-		ImGui::ColorEdit3("Light Color", glm::value_ptr(light->getColorRef()));
-		ImGui::SliderFloat("Intensity", &light->getIntensityRef(), 0.0f, lightType == DIRECTIONAL ? 1.0f : 100.0f);
-		ImGui::Text((std::string("Light Type: ") + std::to_string(light->getType())).c_str());
-		if (lightType == LightType::DIRECTIONAL) {
-			std::string x = std::to_string(((Astra::DirectionalLight*)light)->getDirection().x);
-			std::string y = std::to_string(((Astra::DirectionalLight*)light)->getDirection().y);
-			std::string z = std::to_string(((Astra::DirectionalLight*)light)->getDirection().z);
-
-			ImGui::Text((x + ", " + y + ", " + z).c_str());
-		}
-	}
-
 	if (!scene->getInstances().empty())
 		if (ImGui::Checkbox("Visible", &scene->getInstances()[_node].getVisibleRef())) {
 			scene->updateTopLevelAS(_node);
@@ -201,11 +173,50 @@ void BasiGui::draw(App* app)
 			_node = 0;
 		}
 	}
+
+	ImGui::Separator();
+
+	if (ImGui::BeginListBox("Lights")) {
+
+		for (int i = 0; i < scene->getLights().size(); i++) {
+			auto light = scene->getLights()[i];
+			if (ImGui::Selectable(light->getName().c_str(), i == _light)) {
+				_light = i;
+				_handlingNodes = false;
+			}
+		}
+		ImGui::EndListBox();
+	}
+	if (!scene->getLights().empty()) {
+
+		auto light = scene->getLights()[_light];
+		auto lightType = light->getType();
+		ImGui::ColorEdit3("Light Color", glm::value_ptr(light->getColorRef()));
+		ImGui::InputFloat("Intensity", &light->getIntensityRef());
+		ImGui::Text((std::string("Light Type: ") + std::to_string(light->getType())).c_str());
+
+		if (lightType == DIRECTIONAL) {
+			if (ImGui::Button("Rotate -Z")) {
+				((DirectionalLight*)light)->rotate(glm::vec3(0, 0, 1), glm::radians(-5.0f));
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Rotate +Z")) {
+				((DirectionalLight*)light)->rotate(glm::vec3(0, 0, 1), glm::radians(5.0f));
+			}
+		}
+	}
+
 	if (ImGui::Button("Add Point Light")) {
 		auto newLight = new PointLight(glm::vec3(1.0f), 60);
 		scene->addLight(newLight);
 	}
 	ImGui::SameLine();
+
+	if (ImGui::Button("Add Directional Light")) {
+		auto newLight = new DirectionalLight(glm::vec3(1.0f), 0.6f, glm::vec3(1));
+		scene->addLight(newLight);
+	}
+
 	if (ImGui::Button("Remove Light")) {
 		scene->removeLight(scene->getLights()[_light]);
 		_light = 0;
