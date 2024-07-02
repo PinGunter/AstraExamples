@@ -45,7 +45,6 @@ public:
 
 	bool getRecordingStats();
 	void setRecordingStats(bool b);
-	bool& getUsingShadowsRef();
 
 	void saveStats();
 

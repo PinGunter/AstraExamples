@@ -134,7 +134,7 @@ void BasiGui::draw(App* app)
 	ImGui::Text((std::string("Current Scene ") + std::to_string(app->getCurrentSceneIndex())).c_str());
 	ImGui::SameLine();
 	if (ImGui::Button("Switch")) {
-		app->setCurrentSceneIndex((app->getCurrentSceneIndex() + 1) % 2);
+		app->setCurrentSceneIndex((app->getCurrentSceneIndex() + 1) % app->getScenesCount());
 		_node = 0;
 		_light = 0;
 	}
