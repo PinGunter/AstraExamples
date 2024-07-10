@@ -6,13 +6,6 @@
 #include <myGui.h>
 #include <Utils.h>
 
-// search paths for finding files
-std::vector<std::string> defaultSearchPaths = {
-	NVPSystem::exePath() + PROJECT_RELDIRECTORY,
-	NVPSystem::exePath() + PROJECT_RELDIRECTORY "..",
-	std::string(PROJECT_NAME),
-};
-
 int main(int argc, char** argv)
 {
 	// Device Initialization
@@ -34,17 +27,17 @@ int main(int argc, char** argv)
 	// escena sencilla 
 	Astra::Light* sun = new Astra::DirectionalLight(glm::vec3(1.0f), 0.6f, glm::vec3(1.0f));
 
-	sencilla->loadModel(nvh::findFile("assets/escenas/escena1.obj", defaultSearchPaths));
+	sencilla->loadModel(nvh::findFile("assets/escenas/escena1.obj", Astra::defaultSearchPaths));
 
 	sencilla->addLight(sun);
 	camera->setLookAt(glm::vec3(5, 1.5, 12), glm::vec3(0.0), glm::vec3(0, 1, 0));
 	sencilla->setCamera(camera);
 
-	polis_100->loadModel(nvh::findFile("assets/plane.obj", defaultSearchPaths));
+	polis_100->loadModel(nvh::findFile("assets/plane.obj", Astra::defaultSearchPaths));
 	polis_100->addLight(sun);
 	polis_100->setCamera(camera);
 
-	polis_5m->loadModel(nvh::findFile("assets/plane.obj", defaultSearchPaths));
+	polis_5m->loadModel(nvh::findFile("assets/plane.obj", Astra::defaultSearchPaths));
 	polis_5m->addLight(sun);
 	polis_5m->setCamera(camera);
 

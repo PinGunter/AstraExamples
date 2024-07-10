@@ -7,12 +7,6 @@
 
 void WireframePipeline::create(VkDevice vkdev, const std::vector<VkDescriptorSetLayout>& descsetsLayouts, VkRenderPass rp)
 {
-	std::vector<std::string> defaultSearchPaths = {
-	NVPSystem::exePath() + PROJECT_RELDIRECTORY,
-	NVPSystem::exePath() + PROJECT_RELDIRECTORY "..",
-	std::string(PROJECT_NAME),
-	};
-
 	VkPushConstantRange pushConstantRanges = { VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PushConstantRaster) };
 
 	// Creating the Pipeline Layout
@@ -26,8 +20,8 @@ void WireframePipeline::create(VkDevice vkdev, const std::vector<VkDescriptorSet
 
 	// Pipeline: completely generic, no vertices
 	nvvk::GraphicsPipelineGeneratorCombined pipelineGenerator(vkdev, _layout, rp);
-	pipelineGenerator.addShader(nvh::loadFile("spv/" + std::string(PROJECT_NAME) + "/wireframe.vert.spv", true, defaultSearchPaths, true), VK_SHADER_STAGE_VERTEX_BIT);
-	pipelineGenerator.addShader(nvh::loadFile("spv/" + std::string(PROJECT_NAME) + "/wireframe.frag.spv", true, defaultSearchPaths, true), VK_SHADER_STAGE_FRAGMENT_BIT);
+	pipelineGenerator.addShader(nvh::loadFile("spv/" + std::string(PROJECT_NAME) + "/wireframe.vert.spv", true, Astra::defaultSearchPaths, true), VK_SHADER_STAGE_VERTEX_BIT);
+	pipelineGenerator.addShader(nvh::loadFile("spv/" + std::string(PROJECT_NAME) + "/wireframe.frag.spv", true, Astra::defaultSearchPaths, true), VK_SHADER_STAGE_FRAGMENT_BIT);
 	pipelineGenerator.rasterizationState.cullMode = VK_CULL_MODE_NONE;
 	pipelineGenerator.rasterizationState.polygonMode = VK_POLYGON_MODE_LINE;
 	pipelineGenerator.addBindingDescription({ 0, sizeof(Vertex) });
@@ -41,12 +35,6 @@ void WireframePipeline::create(VkDevice vkdev, const std::vector<VkDescriptorSet
 
 void NormalPipeline::create(VkDevice vkdev, const std::vector<VkDescriptorSetLayout>& descsetsLayouts, VkRenderPass rp)
 {
-	std::vector<std::string> defaultSearchPaths = {
-	NVPSystem::exePath() + PROJECT_RELDIRECTORY,
-	NVPSystem::exePath() + PROJECT_RELDIRECTORY "..",
-	std::string(PROJECT_NAME),
-	};
-
 	VkPushConstantRange pushConstantRanges = { VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PushConstantRaster) };
 
 	// Creating the Pipeline Layout
@@ -59,8 +47,8 @@ void NormalPipeline::create(VkDevice vkdev, const std::vector<VkDescriptorSetLay
 
 
 	nvvk::GraphicsPipelineGeneratorCombined pipelineGenerator(vkdev, _layout, rp);
-	pipelineGenerator.addShader(nvh::loadFile("spv/" + std::string(PROJECT_NAME) + "/normal.vert.spv", true, defaultSearchPaths, true), VK_SHADER_STAGE_VERTEX_BIT);
-	pipelineGenerator.addShader(nvh::loadFile("spv/" + std::string(PROJECT_NAME) + "/normal.frag.spv", true, defaultSearchPaths, true), VK_SHADER_STAGE_FRAGMENT_BIT);
+	pipelineGenerator.addShader(nvh::loadFile("spv/" + std::string(PROJECT_NAME) + "/normal.vert.spv", true, Astra::defaultSearchPaths, true), VK_SHADER_STAGE_VERTEX_BIT);
+	pipelineGenerator.addShader(nvh::loadFile("spv/" + std::string(PROJECT_NAME) + "/normal.frag.spv", true, Astra::defaultSearchPaths, true), VK_SHADER_STAGE_FRAGMENT_BIT);
 	pipelineGenerator.rasterizationState.cullMode = VK_CULL_MODE_BACK_BIT;
 	pipelineGenerator.addBindingDescription({ 0, sizeof(Vertex) });
 	pipelineGenerator.addAttributeDescriptions({
