@@ -60,9 +60,14 @@ void DefaultApp::run()
 		_rendering = false;
 
 		AstraDevice.waitIdle();
-		for (auto& model_pair : _newModels)
+		for (auto& model_pair : _newModelLoads)
 		{
-			addModelToScene(model_pair.first, model_pair.second);
+			addModelLoadToScene(model_pair.first, model_pair.second);
+		}
+		_newModelLoads.clear();
+		for (auto& model : _newModels)
+		{
+			addShape(model);
 		}
 		_newModels.clear();
 
@@ -116,7 +121,7 @@ void DefaultApp::onFileDrop(int count, const char** paths)
 		// check for obj object
 		if (path.extension().string() == ".obj")
 		{
-			addModelToScene(string_path);
+			addModelLoadToScene(string_path);
 		}
 	}
 	else
@@ -226,17 +231,29 @@ void DefaultApp::scheduleReset(bool recreatePipelines)
 	_fullReset = recreatePipelines;
 }
 
-void DefaultApp::addModelToScene(const std::string& filepath, const glm::mat4& transform)
+void DefaultApp::addModelLoadToScene(const std::string& filepath, const glm::mat4& transform)
 {
 	if (_rendering)
 	{
-		_newModels.push_back(std::make_pair(filepath, transform));
+		_newModelLoads.push_back(std::make_pair(filepath, transform));
 	}
 	else
 	{
 		int currentTxtSize = _scenes[_currentScene]->getTextures().size();
 		_scenes[_currentScene]->loadModel(filepath, transform);
 		resetScene(_scenes[_currentScene]->getTextures().size() != currentTxtSize);
+	}
+}
+
+void DefaultApp::addShape(Astra::Mesh& model) {
+	if (_rendering)
+	{
+		_newModels.push_back(model);
+	}
+	else
+	{
+		_scenes[_currentScene]->addShape(model);
+		resetScene(true);
 	}
 }
 

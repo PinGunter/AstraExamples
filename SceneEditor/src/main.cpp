@@ -15,7 +15,7 @@ int main(int argc, char** argv)
 	// App creation
 	DefaultApp app;
 	Astra::Renderer* renderer = new Astra::Renderer();
-	Astra::GuiController* gui = new BasiGui();
+	Astra::GuiController* gui = new BasicGui();
 	Astra::Camera cam;
 	Astra::CameraController* camera = new Astra::FreeCameraController(cam);
 
