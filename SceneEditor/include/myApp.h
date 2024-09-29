@@ -21,7 +21,7 @@ protected:
 	void resetScene(bool recreatePipelines = false) override;
 	void scheduleReset(bool recreatePipelines = false);
 
-	float _frameTime;
+	float _frameTime{ 0 };
 	bool _recordingStats = false;
 
 	std::vector<float> _ftArray;

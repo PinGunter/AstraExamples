@@ -186,7 +186,7 @@ void BasicGui::draw(App* app)
 
 	ImGui::Begin("Performance");
 	ImGui::Text("Resolution: %d x %d", (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-	ImGui::Text("Frame time %.3f ms/frame", dapp->getFrameTime());
+	ImGui::Text("Frame time %.3f ms/frame", dapp->getFrameTime() * 1000);
 	ImGui::Text((std::string("Recording stats: ") + (dapp->getRecordingStats() ? "Yes" : "No")).c_str());
 
 	if (ImGui::Button(

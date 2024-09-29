@@ -43,7 +43,7 @@ void DefaultApp::run()
 		auto cmdList = _renderer->beginFrame();
 
 		// update scene
-		_scenes[_currentScene]->update(cmdList);
+		_scenes[_currentScene]->update(cmdList, _frameTime);
 
 		// offscren render
 
@@ -82,9 +82,9 @@ void DefaultApp::run()
 		}
 		_instToRemove.clear();
 
-		_frameTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - startT).count() / 1000.0f; // microseconds and then divide by 1000.0f for better precision
+		_frameTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - startT).count() / 1e6; // microseconds and then divide by 1000.0f for better precision
 		if (_recordingStats) {
-			_ftArray.push_back(_frameTime);
+			_ftArray.push_back(_frameTime * 1000);
 		}
 	}
 	destroy();

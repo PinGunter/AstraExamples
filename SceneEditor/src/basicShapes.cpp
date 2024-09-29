@@ -32,6 +32,17 @@ Astra::Geometry BasicShapes::boxGeometry(float wide, float height, float depth)
 		{6, 7, 4}
 	};
 
+	geo.normals = {
+		glm::normalize(glm::vec3(1,-1,1)),
+		glm::normalize(glm::vec3(1,1,1)),
+		glm::normalize(glm::vec3(-1,1,1)),
+		glm::normalize(glm::vec3(-1,-1,1)),
+		glm::normalize(glm::vec3(-1,-1,-1)),
+		glm::normalize(glm::vec3(-1,1,-1)),
+		glm::normalize(glm::vec3(1,1,-1)),
+		glm::normalize(glm::vec3(1,-1,-1)),
+	};
+
 	return geo;
 }
 
