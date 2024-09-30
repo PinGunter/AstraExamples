@@ -11,7 +11,7 @@ public:
 	void create(VkDevice vkdev, const std::vector<VkDescriptorSetLayout>& descsetsLayouts, VkRenderPass rp) override;
 };
 
-class ConfigRTPipeline : public Astra::RayTracingPipeline {
+class GreyScalePipeline : public Astra::RasterPipeline {
 public:
-	void create(VkDevice vkdev, const std::vector<VkDescriptorSetLayout>& descsetsLayouts, nvvk::ResourceAllocatorDma& alloc) override;
+	void create(VkDevice vkdev, const std::vector<VkDescriptorSetLayout>& descsetsLayouts, VkRenderPass rp) override;
 };

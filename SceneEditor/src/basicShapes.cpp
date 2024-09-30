@@ -8,6 +8,7 @@ Astra::Geometry BasicShapes::boxGeometry(float wide, float height, float depth)
 	float z = depth / 2.0f;
 
 	geo.vertices = {
+		// v
 		{x, -y, z}, // 0 a
 		{x, y, z}, // 1 b
 		{-x, y, z}, // 2 c
@@ -16,31 +17,78 @@ Astra::Geometry BasicShapes::boxGeometry(float wide, float height, float depth)
 		{-x, y, -z}, // 5 f
 		{x, y, -z}, // 6 g
 		{x, -y, -z}, // 7 h
+
+		// v'
+		{x, -y, z}, // 8 a'
+		{x, y, z}, // 9 b'
+		{-x, y, z}, // 10 c'
+		{-x, -y, z}, // 11 d'
+		{-x, -y, -z}, // 12 e'
+		{-x, y, -z}, // 13 f'
+		{x, y, -z}, // 14 g
+		{x, -y, -z}, // 15 h'
+
+		//v''
+		{x, -y, z}, // 16 a''
+		{x, y, z}, // 17 b''
+		{-x, y, z}, // 18 c''
+		{-x, -y, z}, // 19 d''
+		{-x, -y, -z}, // 20 e''
+		{-x, y, -z}, // 21 f''
+		{x, y, -z}, // 22 g''
+		{x, -y, -z}, // 23 h''
 	};
 	geo.indices = {
 		{0, 1, 2},
 		{2, 3, 0},
-		{1, 6, 5},
-		{5, 2, 1},
-		{0, 7, 6},
-		{6, 1, 0},
-		{2, 5, 3},
-		{5, 4, 3},
-		{0, 3, 7},
-		{3, 4, 7},
-		{4, 5, 6},
-		{6, 7, 4}
+
+		{9, 6, 5},
+		{9, 5, 10},
+
+		{8, 14, 17},
+		{8, 7, 14},
+
+		{11, 18, 13},
+		{4, 11, 13},
+		
+		{12, 15, 16},
+		{12, 16, 19},
+
+		{20, 21, 22},
+		{23, 20, 22}
 	};
 
 	geo.normals = {
-		glm::normalize(glm::vec3(1,-1,1)),
-		glm::normalize(glm::vec3(1,1,1)),
-		glm::normalize(glm::vec3(-1,1,1)),
-		glm::normalize(glm::vec3(-1,-1,1)),
-		glm::normalize(glm::vec3(-1,-1,-1)),
-		glm::normalize(glm::vec3(-1,1,-1)),
-		glm::normalize(glm::vec3(1,1,-1)),
-		glm::normalize(glm::vec3(1,-1,-1)),
+		glm::vec3(0,0,1),// 0 
+		glm::vec3(0,0,1), // 1
+		glm::vec3(0,0,1), // 2
+		glm::vec3(0,0,1), // 3
+		glm::vec3(-1,0,0), // 4
+
+
+		glm::vec3(0,1,0), // 5
+		glm::vec3(0,1,0), // 6
+
+		glm::vec3(1,0,0), // 7
+		glm::vec3(1,0,0), // 8
+
+		glm::vec3(0,1,0), // 9
+		glm::vec3(0,1,0), // 10
+
+		glm::vec3(-1,0,0), // 11
+		glm::vec3(0,-1,0), // 12
+		glm::vec3(-1,0,0), // 13
+		glm::vec3(1,0,0), // 14
+		glm::vec3(0,-1,0), // 15
+
+		glm::vec3(0,-1,0), // 16
+		glm::vec3(1,0,0), // 17
+		glm::vec3(-1,0,0), // 18
+		glm::vec3(0,-1,0), // 19
+		glm::vec3(0,0,-1), // 20
+		glm::vec3(0,0,-1), // 21
+		glm::vec3(0,0,-1), // 22
+		glm::vec3(0,0,-1), // 23
 	};
 
 	return geo;

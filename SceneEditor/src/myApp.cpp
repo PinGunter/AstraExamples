@@ -108,7 +108,11 @@ void DefaultApp::createPipelines()
 	Astra::Pipeline* normalPl = new NormalPipeline();
 	((NormalPipeline*)normalPl)->create(AstraDevice.getVkDevice(), { _descSetLayout }, _renderer->getOffscreenRenderPass());
 
-	_pipelines = { rtPl, rasterPl, wirePl, normalPl };
+	// greyscale
+	Astra::Pipeline* greyscalePl = new GreyScalePipeline();
+	((GreyScalePipeline*)greyscalePl)->create(AstraDevice.getVkDevice(), { _descSetLayout }, _renderer->getOffscreenRenderPass());
+
+	_pipelines = { rtPl, rasterPl, wirePl, normalPl, greyscalePl };
 }
 
 

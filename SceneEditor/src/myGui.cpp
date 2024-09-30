@@ -180,6 +180,8 @@ void BasicGui::draw(App* app)
 	ImGui::RadioButton("Raster", &dapp->getSelectedPipelineRef(), 1);
 	ImGui::RadioButton("Wireframe", &dapp->getSelectedPipelineRef(), 2);
 	ImGui::RadioButton("Normals", &dapp->getSelectedPipelineRef(), 3);
+	ImGui::RadioButton("Greyscale", &dapp->getSelectedPipelineRef(), 4);
+
 
 
 	ImGui::End();

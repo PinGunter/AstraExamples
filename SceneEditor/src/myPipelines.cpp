@@ -57,3 +57,31 @@ void NormalPipeline::create(VkDevice vkdev, const std::vector<VkDescriptorSetLay
 		});
 	_pipeline = pipelineGenerator.createPipeline();
 }
+
+void GreyScalePipeline::create(VkDevice vkdev, const std::vector<VkDescriptorSetLayout>& descsetsLayouts, VkRenderPass rp)
+{
+	VkPushConstantRange pushConstantRanges = { VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof(PushConstantRaster) };
+
+	// Creating the Pipeline Layout
+	VkPipelineLayoutCreateInfo createInfo{ VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO };
+	createInfo.setLayoutCount = static_cast<uint32_t>(descsetsLayouts.size());
+	createInfo.pSetLayouts = descsetsLayouts.data();
+	createInfo.pushConstantRangeCount = 1;
+	createInfo.pPushConstantRanges = &pushConstantRanges;
+	vkCreatePipelineLayout(vkdev, &createInfo, nullptr, &_layout);
+
+	// Creating the Pipeline
+	nvvk::GraphicsPipelineGeneratorCombined gpb(vkdev, _layout, rp);
+	gpb.depthStencilState.depthTestEnable = true;
+	gpb.addShader(nvh::loadFile("spv/" + std::string(PROJECT_NAME) + "/greyscale.vert.spv", true, Astra::defaultSearchPaths, true), VK_SHADER_STAGE_VERTEX_BIT);
+	gpb.addShader(nvh::loadFile("spv/" + std::string(PROJECT_NAME) + "/greyscale.frag.spv", true, Astra::defaultSearchPaths, true), VK_SHADER_STAGE_FRAGMENT_BIT);
+	gpb.addBindingDescription({ 0, sizeof(Vertex) });
+	gpb.addAttributeDescriptions({
+		{0, 0, VK_FORMAT_R32G32B32_SFLOAT, static_cast<uint32_t>(offsetof(Vertex, pos))},
+		{1, 0, VK_FORMAT_R32G32B32_SFLOAT, static_cast<uint32_t>(offsetof(Vertex, nrm))},
+		{2, 0, VK_FORMAT_R32G32B32_SFLOAT, static_cast<uint32_t>(offsetof(Vertex, color))},
+		{3, 0, VK_FORMAT_R32G32_SFLOAT, static_cast<uint32_t>(offsetof(Vertex, texCoord))},
+		});
+
+	_pipeline = gpb.createPipeline();
+}
