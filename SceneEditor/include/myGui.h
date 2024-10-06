@@ -9,7 +9,7 @@ class BasicGui : public Astra::GuiController {
 	int _ncopies{ 1 };
 	bool _handlingNodes{ true };
 	void startDockableWindow();
-	void CubeCreator(DefaultApp* app);
+	void ShapeCreator(DefaultApp* app);
 	void ModelAndInstances(DefaultApp* app);
 public:
 	void draw(Astra::App* app) override;

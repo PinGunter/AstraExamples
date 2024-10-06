@@ -82,16 +82,30 @@ void BasicGui::startDockableWindow()
 
 }
 
-void BasicGui::CubeCreator(DefaultApp * app)
+void BasicGui::ShapeCreator(DefaultApp * app)
 {
 	ImGui::Begin("Shapes");
 
-	//static float dim[3] = { 10.0f };
-	//ImGui::SliderFloat3("Dimensions", dim, 0.0f, 10.0f);
+	// cube
+	static float dim[3] = { 1.0f, 1.0f, 1.0f};
+	ImGui::SliderFloat3("Dimensions", dim, 0.0f, 10.0f);
 	if (ImGui::Button("Add Cube")) {
-		auto geo = BasicShapes::boxGeometry();
+		auto geo = BasicShapes::boxGeometry(dim[0], dim[1], dim[2]);
 		WaveFrontMaterial mat{};
 		mat.diffuse = glm::vec3(1, 0, 0);
+		mat.illum = 2;
+		mat.textureId = -1;
+		Astra::Mesh mesh;
+		mesh.fromGeoMat(geo, mat);
+		app->addShape(mesh);
+		//Astra::MeshInstance instance(mesh.meshId);
+		//app->addInstanceToScene(instance);
+	}
+
+	if (ImGui::Button("Add Torus")) {
+		auto geo = BasicShapes::TorusGeometry(10.0f, 5.f, 32, 32);
+		WaveFrontMaterial mat{};
+		mat.diffuse = glm::vec3(0.3f, 0.9f, 0.5f);
 		mat.illum = 2;
 		mat.textureId = -1;
 		Astra::Mesh mesh;
@@ -163,7 +177,7 @@ void BasicGui::draw(App* app)
 
 	startDockableWindow();
 
-	CubeCreator(dapp);
+	ShapeCreator(dapp);
 
 	ImGui::Begin("Renderer");
 

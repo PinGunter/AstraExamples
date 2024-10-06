@@ -1,4 +1,5 @@
 #include <basicShapes.h>
+#include <glm/gtc/constants.hpp>
 
 Astra::Geometry BasicShapes::boxGeometry(float wide, float height, float depth)
 {
@@ -126,5 +127,45 @@ Astra::Geometry BasicShapes::TetrahedronGeometry(float size)
 
 Astra::Geometry BasicShapes::TorusGeometry(float radius, float tube, uint32_t radResolution, uint32_t tubeResolution)
 {
-	return Astra::Geometry();
+	Astra::Geometry geo{};
+
+	glm::vec3 center{}, vertex{}, normal{};
+	float pi = glm::pi<float>();
+
+	// vertices
+	for (int j = 0; j <= radResolution; j++) {
+		for (int i = 0; i <= tubeResolution; i++) {
+			float u = (float) i / tubeResolution * pi * 2.0f;
+			float v = (float) j / radResolution * pi * 2.0f;
+
+			// vertex
+			vertex.x = (radius + tube * cos(v)) * cos(u);
+			vertex.y = (radius + tube * cos(v)) * sin(u);
+			vertex.z = tube * sin(v);
+
+			geo.vertices.push_back(vertex);
+
+			// normal
+			center.x = radius * cos(u);
+			center.y = radius * sin(u);
+			normal = glm::normalize(vertex - center);
+
+			geo.normals.push_back(normal);
+		}
+	}
+
+	// indices
+	for (int j = 1; j <= radResolution; j++) {
+		for (int i = 1; i <= tubeResolution; i++) {
+			uint a = (tubeResolution + 1) * j + i - 1;
+			uint b = (tubeResolution + 1) * (j - 1) + i - 1;
+			uint c = (tubeResolution + 1) * (j - 1) + i;
+			uint d = (tubeResolution + 1) * j + i;
+
+			geo.indices.push_back({ a, b, d });
+			geo.indices.push_back({ b, c, d });
+		}
+	}
+
+	return geo;
 }
