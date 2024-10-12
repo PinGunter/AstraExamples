@@ -1,6 +1,13 @@
 #include <basicShapes.h>
 #include <glm/gtc/constants.hpp>
 
+/**
+* A lot of these geometries are computed following 
+* Three.js implementation
+* https://github.com/mrdoob/three.js/blob/master/src/geometries/
+*/
+
+
 Astra::Geometry BasicShapes::boxGeometry(float wide, float height, float depth)
 {
 	Astra::Geometry geo{};
@@ -97,7 +104,66 @@ Astra::Geometry BasicShapes::boxGeometry(float wide, float height, float depth)
 
 Astra::Geometry BasicShapes::SphereGeometry(float radius, uint32_t resolutionX, uint32_t resolutionY)
 {
-	return Astra::Geometry();
+	Astra::Geometry geo{};
+
+	uint index = 0;
+	std::vector<std::vector<uint>> grid{};
+
+	glm::vec3 vertex{};
+
+	const float phiLength =  glm::pi<float>() * 2.0f ;
+	const float thetaLengt = glm::pi<float>();
+
+	resolutionX = glm::max<uint32_t>(3, resolutionX);
+	resolutionY = glm::max<uint32_t>(2, resolutionY);
+
+	for (int iy = 0; iy <= resolutionY; iy++) {
+		std::vector<uint> row{};
+
+		float v = (float) iy / resolutionY;
+
+		float uOffset = 0.0f;
+
+		if (iy == 0) {
+			uOffset = 0.5f / resolutionX;
+		}
+		else if (iy == resolutionY) {
+			uOffset = -0.5 / resolutionX;
+		}
+
+		for (int ix = 0; ix <= resolutionX; ix++) {
+			float u = (float ) ix / resolutionX;
+
+			vertex.x = -radius * cos(u * phiLength) * sin(v * thetaLengt);
+			vertex.y = radius * cos(v * thetaLengt);
+			vertex.z = radius * sin(u * phiLength) * sin(v * thetaLengt);
+
+			geo.vertices.push_back(vertex);
+
+			geo.normals.push_back(glm::normalize(vertex));
+
+			row.push_back(index++);
+		}
+		grid.push_back(row);
+	}
+
+	// indices
+	for (int iy = 0; iy < resolutionY; iy++) {
+		for (int ix = 0; ix < resolutionX; ix++) {
+			uint a, b, c, d;
+
+			a = grid[iy][ix + 1];
+			b = grid[iy][ix];
+			c = grid[iy + 1][ix];
+			d = grid[iy + 1][ix + 1];
+
+			if (iy != 0) geo.indices.push_back({ a,b,d });
+			if (iy != resolutionY - 1) geo.indices.push_back({ b,c,d });
+		}
+	}
+
+
+	return geo;
 }
 
 Astra::Geometry BasicShapes::CylinderGeometry(float radius, float height, uint32_t resolution)
@@ -110,7 +176,7 @@ Astra::Geometry BasicShapes::ConeGeometry(float radius, float height, uint32_t r
 	return Astra::Geometry();
 }
 
-Astra::Geometry BasicShapes::IcosahedronGeometry(float radius, uint32_t resolution)
+Astra::Geometry BasicShapes::IcosahedronGeometry(float radius)
 {
 	return Astra::Geometry();
 }

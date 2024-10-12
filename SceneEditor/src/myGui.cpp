@@ -102,6 +102,19 @@ void BasicGui::ShapeCreator(DefaultApp * app)
 		//app->addInstanceToScene(instance);
 	}
 
+	if (ImGui::Button("Add Sphere")) {
+		auto geo = BasicShapes::SphereGeometry(5, 32, 32);
+		WaveFrontMaterial mat{};
+		mat.diffuse = glm::vec3(0, 1, 0);
+		mat.illum = 2;
+		mat.textureId = -1;
+		Astra::Mesh mesh;
+		mesh.fromGeoMat(geo, mat);
+		app->addShape(mesh);
+		//Astra::MeshInstance instance(mesh.meshId);
+		//app->addInstanceToScene(instance);
+	}
+
 	if (ImGui::Button("Add Torus")) {
 		auto geo = BasicShapes::TorusGeometry(10.0f, 5.f, 32, 32);
 		WaveFrontMaterial mat{};
@@ -125,7 +138,7 @@ void BasicGui::ModelAndInstances(DefaultApp* dapp) {
 
 		for (int i = 0; i < scene->getModels().size(); i++) {
 			auto& model = scene->getModels()[i];
-			std::string label = "Model " + std::to_string(i);
+			std::string label = model.name.empty() ? "Model " + std::to_string(i) : model.name;
 			if (ImGui::Selectable(label.c_str(), i == selModel)) {
 				selModel = i;
 				_handlingNodes = true;
