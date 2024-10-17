@@ -1,10 +1,10 @@
-#include "ptpipeline.h"
-#include <nvh/alignment.hpp>
-#include <Device.h>
-#include <nvpsystem.hpp>
+#include <ptPipeline.h>
 #include <nvh/fileoperations.hpp>
+#include <host_device.h>
+#include <Device.h>
+#include <nvh/alignment.hpp>
 
-void PathtracingPipeline::createSBT(nvvk::ResourceAllocatorDma& alloc, const VkPhysicalDeviceRayTracingPipelinePropertiesKHR& rtProperties)
+void PtPipeline::createSBT(nvvk::ResourceAllocatorDma& alloc, const VkPhysicalDeviceRayTracingPipelinePropertiesKHR& rtProperties)
 {
 	uint32_t missCount{ 1 };
 	uint32_t hitCount{ 1 };
@@ -73,7 +73,7 @@ void PathtracingPipeline::createSBT(nvvk::ResourceAllocatorDma& alloc, const VkP
 	alloc.finalizeAndReleaseStaging();
 }
 
-void PathtracingPipeline::create(VkDevice vkdev, const std::vector<VkDescriptorSetLayout>& descsetsLayouts, nvvk::ResourceAllocatorDma& alloc)
+void PtPipeline::create(VkDevice vkdev, const std::vector<VkDescriptorSetLayout>& descsets, nvvk::ResourceAllocatorDma& alloc)
 {
 	auto rtProperties = AstraDevice.getRtProperties();
 	if (!AstraDevice.getRtEnabled())
@@ -100,17 +100,17 @@ void PathtracingPipeline::create(VkDevice vkdev, const std::vector<VkDescriptorS
 	stage.pName = "main";
 
 	// raygen
-	stage.module = AstraDevice.createShaderModule(nvh::loadFile("spv/Pathtracer/pathtrace.rgen.spv", true, Astra::defaultSearchPaths, true));
+	stage.module = AstraDevice.createShaderModule(nvh::loadFile("spv/Pathtracer/pt.rgen.spv", true, Astra::defaultSearchPaths, true));
 	stage.stage = VK_SHADER_STAGE_RAYGEN_BIT_KHR;
 	stages[eRaygen] = stage;
 
 	// miss
-	stage.module = AstraDevice.createShaderModule(nvh::loadFile("spv/Pathtracer/pathtrace.rmiss.spv", true, Astra::defaultSearchPaths, true));
+	stage.module = AstraDevice.createShaderModule(nvh::loadFile("spv/Pathtracer/pt.rmiss.spv", true, Astra::defaultSearchPaths, true));
 	stage.stage = VK_SHADER_STAGE_MISS_BIT_KHR;
 	stages[eMiss] = stage;
 
 	// chit
-	stage.module = AstraDevice.createShaderModule(nvh::loadFile("spv/Pathtracer/pathtrace.rchit.spv", true, Astra::defaultSearchPaths, true));
+	stage.module = AstraDevice.createShaderModule(nvh::loadFile("spv/Pathtracer/pt.rchit.spv", true, Astra::defaultSearchPaths, true));
 	stage.stage = VK_SHADER_STAGE_CLOSEST_HIT_BIT_KHR;
 	stages[eClosestHit] = stage;
 
@@ -147,8 +147,8 @@ void PathtracingPipeline::create(VkDevice vkdev, const std::vector<VkDescriptorS
 	pipelineLayoutCreateInfo.pPushConstantRanges = &pushConstant;
 
 	// descriptor sets: one specific to rt (set=0, tlas) , other shared with raster (set=1, scene data)
-	pipelineLayoutCreateInfo.setLayoutCount = static_cast<uint32_t>(descsetsLayouts.size());
-	pipelineLayoutCreateInfo.pSetLayouts = descsetsLayouts.data();
+	pipelineLayoutCreateInfo.setLayoutCount = static_cast<uint32_t>(descsets.size());
+	pipelineLayoutCreateInfo.pSetLayouts = descsets.data();
 
 	if ((vkCreatePipelineLayout(vkdev, &pipelineLayoutCreateInfo, nullptr, &_layout) != VK_SUCCESS))
 	{
@@ -167,7 +167,7 @@ void PathtracingPipeline::create(VkDevice vkdev, const std::vector<VkDescriptorS
 	rayPipelineInfo.pGroups = _rtShaderGroups.data();
 
 	// recursion depth
-	rayPipelineInfo.maxPipelineRayRecursionDepth = 1;
+	rayPipelineInfo.maxPipelineRayRecursionDepth = rtProperties.maxRayRecursionDepth; // rtProperties.maxRayRecursionDepth; // shadow
 	rayPipelineInfo.layout = _layout;
 
 	if ((vkCreateRayTracingPipelinesKHR(vkdev, {}, {}, 1, &rayPipelineInfo, nullptr, &_pipeline) != VK_SUCCESS))

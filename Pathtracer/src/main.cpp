@@ -1,38 +1,40 @@
-#include <ptapp.h>
-#include <ptscene.h>
-#include <nvh/fileoperations.hpp>
-#include <nvpsystem.hpp>
+#include <ptApp.h>
 #include <Utils.h>
-#include <gui.h>
+#include <nvh/fileoperations.hpp>
+#include <ptScene.h>
 
 int main() {
-	Astra::DeviceCreateInfo dci{};
-	AstraDevice.initDevice(dci);
-	
-	PathtracerApp app;
-	Astra::Renderer  * renderer = new Astra::Renderer();
-	PTScene * scene = new PTScene();
+	Astra::DeviceCreateInfo createInfo{};
+	AstraDevice.initDevice(createInfo);
 
-	Astra::DirectionalLight * sun = new Astra::DirectionalLight(glm::vec3(1.0f), 0.6f, glm::vec3(1));
-	Astra::Camera camera;
-	Astra::OrbitCameraController cameraController(camera);
+	PtApp app;
 
-	scene->addLight(sun);
-	scene->setCamera(&cameraController);
+	Astra::Renderer* renderer = new Astra::Renderer();
+	Astra::Camera cam;
+	Astra::CameraController* cameraController = new Astra::OrbitCameraController(cam);
 
-	scene->loadModel(nvh::findFile("assets/plane.obj", Astra::defaultSearchPaths));
-	scene->loadModel(nvh::findFile("assets/cube.obj", Astra::defaultSearchPaths));
+	Astra::SceneRT* scene = new PtScene();
 
-	PtGui * gui = new PtGui();
 
-	app.init({ scene }, renderer, gui);
+	Astra::Light* lightBulb = new Astra::PointLight(glm::vec3(1), 3.0f);
+
+	cameraController->setLookAt(glm::vec3(5, 1.5, 12), glm::vec3(0.0), glm::vec3(0, 1, 0));
+
+	scene->loadModel(nvh::findFile("assets/cornell.obj", Astra::defaultSearchPaths));
+	scene->addLight(lightBulb);
+	scene->setCamera(cameraController);
 
 	try {
+		app.init({ scene }, renderer);
 		app.run();
 	}
-	catch (...) {
+	catch (const std::exception& exc) {
 		app.destroy();
-		Astra::Log("Error ocurred", Astra::ERR);
+		Astra::Log("Exception ocurred: " + std::string(exc.what()), Astra::ERR);
 	}
 	AstraDevice.destroy();
+
+	delete renderer;
+	delete cameraController;
+	delete lightBulb;
 }

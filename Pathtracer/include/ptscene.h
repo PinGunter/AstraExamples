@@ -1,12 +1,11 @@
 #pragma once
 #include <Scene.h>
 
-class PTScene : public Astra::SceneRT {
-	bool _cameraUpdate = false;
+class PtScene : public Astra::SceneRT {
+protected:
+	bool _updated{false};
+	int _frames = 0;
 public:
-	bool getCameraUpdate();
-	void update(const Astra::CommandList& cmdList) override;
+	void update(const Astra::CommandList& cmdList, float delta) override;
 	void draw(Astra::RenderContext<PushConstantRay>& renderContext) override;
-	void draw(Astra::RenderContext<PushConstantRaster>& renderContext) override;
-
 };
