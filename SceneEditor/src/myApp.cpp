@@ -43,7 +43,7 @@ void DefaultApp::run()
 		auto cmdList = _renderer->beginFrame();
 
 		// update scene
-		_scenes[_currentScene]->update(cmdList);
+		_scenes[_currentScene]->update(cmdList, _frameTime);
 
 		// offscren render
 
@@ -60,9 +60,14 @@ void DefaultApp::run()
 		_rendering = false;
 
 		AstraDevice.waitIdle();
-		for (auto& model_pair : _newModels)
+		for (auto& model_pair : _newModelLoads)
 		{
-			addModelToScene(model_pair.first, model_pair.second);
+			addModelLoadToScene(model_pair.first, model_pair.second);
+		}
+		_newModelLoads.clear();
+		for (auto& model : _newModels)
+		{
+			addShape(model);
 		}
 		_newModels.clear();
 
@@ -77,9 +82,9 @@ void DefaultApp::run()
 		}
 		_instToRemove.clear();
 
-		_frameTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - startT).count() / 1000.0f; // microseconds and then divide by 1000.0f for better precision
+		_frameTime = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - startT).count() / 1e6; // microseconds and then divide by 1000.0f for better precision
 		if (_recordingStats) {
-			_ftArray.push_back(_frameTime);
+			_ftArray.push_back(_frameTime * 1000);
 		}
 	}
 	destroy();
@@ -103,7 +108,11 @@ void DefaultApp::createPipelines()
 	Astra::Pipeline* normalPl = new NormalPipeline();
 	((NormalPipeline*)normalPl)->create(AstraDevice.getVkDevice(), { _descSetLayout }, _renderer->getOffscreenRenderPass());
 
-	_pipelines = { rtPl, rasterPl, wirePl, normalPl };
+	// greyscale
+	Astra::Pipeline* greyscalePl = new GreyScalePipeline();
+	((GreyScalePipeline*)greyscalePl)->create(AstraDevice.getVkDevice(), { _descSetLayout }, _renderer->getOffscreenRenderPass());
+
+	_pipelines = { rtPl, rasterPl, wirePl, normalPl, greyscalePl };
 }
 
 
@@ -116,7 +125,7 @@ void DefaultApp::onFileDrop(int count, const char** paths)
 		// check for obj object
 		if (path.extension().string() == ".obj")
 		{
-			addModelToScene(string_path);
+			addModelLoadToScene(string_path);
 		}
 	}
 	else
@@ -226,17 +235,29 @@ void DefaultApp::scheduleReset(bool recreatePipelines)
 	_fullReset = recreatePipelines;
 }
 
-void DefaultApp::addModelToScene(const std::string& filepath, const glm::mat4& transform)
+void DefaultApp::addModelLoadToScene(const std::string& filepath, const glm::mat4& transform)
 {
 	if (_rendering)
 	{
-		_newModels.push_back(std::make_pair(filepath, transform));
+		_newModelLoads.push_back(std::make_pair(filepath, transform));
 	}
 	else
 	{
 		int currentTxtSize = _scenes[_currentScene]->getTextures().size();
 		_scenes[_currentScene]->loadModel(filepath, transform);
 		resetScene(_scenes[_currentScene]->getTextures().size() != currentTxtSize);
+	}
+}
+
+void DefaultApp::addShape(Astra::Mesh& model) {
+	if (_rendering)
+	{
+		_newModels.push_back(model);
+	}
+	else
+	{
+		_scenes[_currentScene]->addShape(model);
+		resetScene(true);
 	}
 }
 

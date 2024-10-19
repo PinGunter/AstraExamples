@@ -1,14 +1,12 @@
 #include <myGui.h>
-#include <myApp.h>
-#include <glm/gtc/type_ptr.hpp>
-#include <Utils.h>
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include <imgui_internal.h>
-#include <implot.h>
+#include <basicShapes.h>
+#include <glm/gtc/type_ptr.hpp>
 
 
 using namespace Astra;
-void BasiGui::startDockableWindow()
+void BasicGui::startDockableWindow()
 {
 	// Keeping the unique ID of the dock space
 	auto dockspaceID = ImGui::GetID("DockSpace");
@@ -84,13 +82,115 @@ void BasiGui::startDockableWindow()
 
 }
 
-void BasiGui::draw(App* app)
+void BasicGui::ShapeCreator(DefaultApp * app)
+{
+	ImGui::Begin("Shapes");
+
+	// cube
+	static float dim[3] = { 1.0f, 1.0f, 1.0f};
+	ImGui::SliderFloat3("Dimensions", dim, 0.0f, 10.0f);
+	if (ImGui::Button("Add Cube")) {
+		auto geo = BasicShapes::boxGeometry(dim[0], dim[1], dim[2]);
+		WaveFrontMaterial mat{};
+		mat.diffuse = glm::vec3(1, 0, 0);
+		mat.illum = 2;
+		mat.textureId = -1;
+		Astra::Mesh mesh;
+		mesh.fromGeoMat(geo, mat);
+		app->addShape(mesh);
+		//Astra::MeshInstance instance(mesh.meshId);
+		//app->addInstanceToScene(instance);
+	}
+
+	if (ImGui::Button("Add Sphere")) {
+		auto geo = BasicShapes::SphereGeometry(5, 32, 32);
+		WaveFrontMaterial mat{};
+		mat.diffuse = glm::vec3(0, 1, 0);
+		mat.illum = 2;
+		mat.textureId = -1;
+		Astra::Mesh mesh;
+		mesh.fromGeoMat(geo, mat);
+		app->addShape(mesh);
+		//Astra::MeshInstance instance(mesh.meshId);
+		//app->addInstanceToScene(instance);
+	}
+
+	if (ImGui::Button("Add Torus")) {
+		auto geo = BasicShapes::TorusGeometry(10.0f, 5.f, 32, 32);
+		WaveFrontMaterial mat{};
+		mat.diffuse = glm::vec3(0.3f, 0.9f, 0.5f);
+		mat.illum = 2;
+		mat.textureId = -1;
+		Astra::Mesh mesh;
+		mesh.fromGeoMat(geo, mat);
+		app->addShape(mesh);
+		//Astra::MeshInstance instance(mesh.meshId);
+		//app->addInstanceToScene(instance);
+	}
+
+	ImGui::End();
+}
+
+void BasicGui::ModelAndInstances(DefaultApp* dapp) {
+	Astra::SceneRT* scene = ((SceneRT*)dapp->getCurrentScene());
+	static int selModel = 0;
+	if (ImGui::BeginListBox("Models")) {
+
+		for (int i = 0; i < scene->getModels().size(); i++) {
+			auto& model = scene->getModels()[i];
+			std::string label = model.name.empty() ? "Model " + std::to_string(i) : model.name;
+			if (ImGui::Selectable(label.c_str(), i == selModel)) {
+				selModel = i;
+				_handlingNodes = true;
+			}
+		}
+		ImGui::EndListBox();
+	}
+	if (ImGui::BeginListBox("Instances")) {
+
+		for (int i = 0; i < scene->getInstances().size(); i++) {
+			auto& inst = scene->getInstances()[i];
+			if (ImGui::Selectable(inst.getName().c_str(), i == _node)) {
+				_node = i;
+				_handlingNodes = true;
+			}
+		}
+		ImGui::EndListBox();
+	}
+	if (!scene->getInstances().empty())
+		if (ImGui::Checkbox("Visible", &scene->getInstances()[_node].getVisibleRef())) {
+			scene->updateTopLevelAS(_node);
+		}
+
+	if (ImGui::Button("New instance")) {
+		dapp->addInstanceToScene(MeshInstance(scene->getModels()[selModel].meshId));
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Remove instance")) {
+		if (scene->getInstances().size() == 1) {
+			// last element
+			// we cannot have an empty raytracing scene since the AS have to have something. They cant be empty
+			// we could trick it by using a 0 mask on collisisions but the memory would still be there
+			// since having no instantes is something that should not be common we are not going to allow it
+			ImGui::OpenPopup("Empty RT Scene Warning");
+		}
+
+		else {
+			dapp->removeInstance(_node);
+			_node = 0;
+		}
+	}
+}
+
+void BasicGui::draw(App* app)
 {
 	DefaultApp* dapp = static_cast<DefaultApp*>(app);
 	SceneRT* scene = (SceneRT*)dapp->getCurrentScene();
 	ImGuiIO& io = ImGui::GetIO();
 
 	startDockableWindow();
+
+	ShapeCreator(dapp);
 
 	ImGui::Begin("Renderer");
 
@@ -107,13 +207,15 @@ void BasiGui::draw(App* app)
 	ImGui::RadioButton("Raster", &dapp->getSelectedPipelineRef(), 1);
 	ImGui::RadioButton("Wireframe", &dapp->getSelectedPipelineRef(), 2);
 	ImGui::RadioButton("Normals", &dapp->getSelectedPipelineRef(), 3);
+	ImGui::RadioButton("Greyscale", &dapp->getSelectedPipelineRef(), 4);
+
 
 
 	ImGui::End();
 
 	ImGui::Begin("Performance");
 	ImGui::Text("Resolution: %d x %d", (int)io.DisplaySize.x, (int)io.DisplaySize.y);
-	ImGui::Text("Frame time %.3f ms/frame", dapp->getFrameTime());
+	ImGui::Text("Frame time %.3f ms/frame", dapp->getFrameTime() * 1000);
 	ImGui::Text((std::string("Recording stats: ") + (dapp->getRecordingStats() ? "Yes" : "No")).c_str());
 
 	if (ImGui::Button(
@@ -139,40 +241,7 @@ void BasiGui::draw(App* app)
 		_light = 0;
 	}
 
-	if (ImGui::BeginListBox("Instances")) {
-
-		for (int i = 0; i < scene->getInstances().size(); i++) {
-			auto& inst = scene->getInstances()[i];
-			if (ImGui::Selectable(inst.getName().c_str(), i == _node)) {
-				_node = i;
-				_handlingNodes = true;
-			}
-		}
-		ImGui::EndListBox();
-	}
-	if (!scene->getInstances().empty())
-		if (ImGui::Checkbox("Visible", &scene->getInstances()[_node].getVisibleRef())) {
-			scene->updateTopLevelAS(_node);
-		}
-
-	if (ImGui::Button("New instance")) {
-		dapp->addInstanceToScene(MeshInstance(scene->getInstances()[_node].getMeshIndex(), scene->getInstances()[_node].getTransform(), scene->getInstances()[_node].getName() + " copy" + std::to_string(_ncopies++)));
-	}
-	ImGui::SameLine();
-	if (ImGui::Button("Remove instance")) {
-		if (scene->getInstances().size() == 1) {
-			// last element
-			// we cannot have an empty raytracing scene since the AS have to have something. They cant be empty
-			// we could trick it by using a 0 mask on collisisions but the memory would still be there
-			// since having no instantes is something that should not be common we are not going to allow it
-			ImGui::OpenPopup("Empty RT Scene Warning");
-		}
-
-		else {
-			dapp->removeInstance(_node);
-			_node = 0;
-		}
-	}
+	ModelAndInstances(dapp);
 
 	ImGui::Separator();
 

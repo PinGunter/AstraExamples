@@ -7,7 +7,8 @@ protected:
 	enum Pipeline { RT, RASTER, WIRE, NORMALS };
 	// models and instances to load or remove after frame execution, when gpu is ready
 	std::vector< Astra::MeshInstance> _newInstances;
-	std::vector<std::pair<std::string, glm::mat4>> _newModels;
+	std::vector<Astra::Mesh> _newModels;
+	std::vector<std::pair<std::string, glm::mat4>> _newModelLoads;
 	std::vector<int> _instToRemove;
 	bool _rendering = false;
 	bool _needsReset = false;
@@ -20,7 +21,7 @@ protected:
 	void resetScene(bool recreatePipelines = false) override;
 	void scheduleReset(bool recreatePipelines = false);
 
-	float _frameTime;
+	float _frameTime{ 0 };
 	bool _recordingStats = false;
 
 	std::vector<float> _ftArray;
@@ -34,7 +35,8 @@ public:
 	void run() override;
 
 	// add models / instances in runtime
-	void addModelToScene(const std::string& filepath, const glm::mat4& transform = glm::mat4(1.0f));
+	void addModelLoadToScene(const std::string& filepath, const glm::mat4& transform = glm::mat4(1.0f));
+	void addShape(Astra::Mesh&);
 	void addInstanceToScene(const Astra::MeshInstance& instance);
 	void removeInstance(int instance);
 
