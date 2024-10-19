@@ -6,7 +6,7 @@ Currently there is only one example as the library is in active development.
 
 ### Simple pathtracer
 
-![](img\pathtracer.png)
+![](img/pathtracer.png)
 
 ### Basic Wavefront (.obj) visualizator (SceneEditor)
 
