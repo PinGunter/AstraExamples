@@ -20,7 +20,9 @@ int main() {
 
 	cameraController->setLookAt(glm::vec3(5, 1.5, 12), glm::vec3(0.0), glm::vec3(0, 1, 0));
 
+	//scene->loadModel(nvh::findFile("assets/casa_monos.obj", Astra::defaultSearchPaths));
 	scene->loadModel(nvh::findFile("assets/cornell.obj", Astra::defaultSearchPaths));
+	//scene->loadModel("C:\\Users\\pingu\\AstraExamples\\SceneEditor\\assets\\coche.obj");
 	scene->addLight(lightBulb);
 	scene->setCamera(cameraController);
 

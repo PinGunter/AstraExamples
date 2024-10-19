@@ -21,7 +21,6 @@ void main()
     else 
     {
         prd.hitValue = vec3(0.01);
-        prd.depth = 100;
     }
-    
+    prd.depth = 100;    
 }

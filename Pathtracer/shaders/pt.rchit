@@ -73,17 +73,17 @@ void main()
          albedo *= texture(textureSamplers[nonuniformEXT(txtId)], texCoord).xyz;
 	}
 
-	vec3 BRDF = albedo / M_PI;
+	 vec3 BRDF = albedo / M_PI;
 
 	if (prd.depth < 10)
-	{
+	  {
 		prd.depth++;
 		float tMin = 0.001;
 		float tMax = 100000000.0;
 		uint flags = gl_RayFlagsOpaqueEXT;
 		traceRayEXT(topLevelAS,flags,0xFF,0,0,0,rayOrigin,tMin,rayDirection, tMax, 0);
-	}
-
+	  }
+	
 	vec3 incoming = prd.hitValue;
 
 	prd.hitValue = emittance + (BRDF * incoming * cos_theta/p);
