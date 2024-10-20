@@ -20,7 +20,7 @@ void main()
     } 
     else 
     {
-        prd.hitValue = 0.3 * pcRay.clearColor.xyz;
+        prd.hitValue = 0.03 * pcRay.clearColor.xyz;
     }
     prd.depth = 100;    
 }

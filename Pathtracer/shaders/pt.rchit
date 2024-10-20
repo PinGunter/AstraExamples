@@ -68,9 +68,14 @@ void main()
 
 	vec3 albedo = mat.diffuse;
 
-	
-	 if (mat.shininess >= 1000.0f){
+	// dont know if exactly right
+	// but will use roughness as "fuzz" https://raytracing.github.io/books/RayTracingInOneWeekend.html#metal/fuzzyreflection
+	// metallic considered if metalness == 1
+	 if (mat.metalness == 1.0f){
 		rayDirection = reflect(gl_WorldRayDirectionEXT, worldNrm);
+		if (mat.roughness > 0.0f)
+			rayDirection = normalize(rayDirection) + normalize(mat.roughness * samplingHemisphere(prd.seed, tangent, bitangent, worldNrm));
+		albedo *= mat.specular;
 	 }
 
 	if (mat.textureId > -1){

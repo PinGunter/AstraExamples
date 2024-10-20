@@ -25,7 +25,7 @@ int main() {
 	scene->loadModel(nvh::findFile("assets/cornell.obj", Astra::defaultSearchPaths));
 	//scene->loadModel("C:\\Users\\pingu\\AstraExamples\\SceneEditor\\assets\\plane.obj");
 	//scene->loadModel(nvh::findFile("assets/bombilla.obj", Astra::defaultSearchPaths));
-	//scene->loadModel("C:\\Users\\pingu\\AstraExamples\\SceneEditor\\assets\\coche.obj");
+	//scene->loadModel("C:\\Users\\pingu\\Downloads\\rungholt\\rungholt.obj");
 	//scene->loadModel(nvh::findFile("assets/streetlight.obj", Astra::defaultSearchPaths), glm::translate(glm::mat4(1.0f), glm::vec3(3.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), -3.14f/2.0f, glm::vec3(0.f, 1.f, 0.f)));
 	scene->addLight(lightBulb);
 
