@@ -8,5 +8,5 @@ include(AstraEngine/setup.cmake)
 #
 
 add_subdirectory(SceneEditor)
-
+add_subdirectory(Pathtracer)
 

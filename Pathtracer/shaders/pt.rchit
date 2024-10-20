@@ -67,6 +67,12 @@ void main()
 	const float p = cos_theta / M_PI;
 
 	vec3 albedo = mat.diffuse;
+
+	
+	 if (mat.shininess >= 1000.0f){
+		rayDirection = reflect(gl_WorldRayDirectionEXT, worldNrm);
+	 }
+
 	if (mat.textureId > -1){
 		 uint txtId    = mat.textureId + objDesc.i[gl_InstanceCustomIndexEXT].txtOffset;
          vec2 texCoord = v0.texCoord * barycentrics.x + v1.texCoord * barycentrics.y + v2.texCoord * barycentrics.z;
@@ -74,6 +80,8 @@ void main()
 	}
 
 	 vec3 BRDF = albedo / M_PI;
+
+
 
 	if (prd.depth < 10)
 	  {

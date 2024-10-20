@@ -16,11 +16,11 @@ void main()
     {
         const vec2 pixelCenter = vec2(gl_LaunchIDEXT.xy) + vec2(0.5);
         const vec2 inUV = pixelCenter/vec2(gl_LaunchSizeEXT.xy);
-        prd.hitValue = mix( pcRay.clearColor.xyz, vec3(1), inUV.y);    
+        prd.hitValue = mix( pcRay.clearColor.xyz, pcRay.clearColor2.xyz, inUV.y);    
     } 
     else 
     {
-        prd.hitValue = vec3(0.01);
+        prd.hitValue = 0.3 * pcRay.clearColor.xyz;
     }
     prd.depth = 100;    
 }

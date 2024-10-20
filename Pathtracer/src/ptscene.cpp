@@ -1,5 +1,6 @@
 #include <ptScene.h>
 #include <Utils.h>
+#include <glm/gtc/type_ptr.hpp>
 
 void PtScene::update(const Astra::CommandList& cmdList, float delta)
 {
@@ -45,6 +46,11 @@ void PtScene::draw(Astra::RenderContext<PushConstantRay>& renderContext)
 	++_frames;
 	_frames = _updated ? -1 : _frames;
 	renderContext.pushConstant.frame = _frames;
-	renderContext.pushConstant.clearColor = glm::vec4(0.5f, 0.7f, 1.0f, 1.f);
+	renderContext.pushConstant.clearColor2 = glm::vec4(_clearColor2,1.0f);
 	Astra::SceneRT::draw(renderContext);
+}
+
+float* PtScene::getClearColor2()
+{
+	return glm::value_ptr(_clearColor2);
 }

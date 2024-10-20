@@ -2,6 +2,8 @@
 #include <Utils.h>
 #include <nvh/fileoperations.hpp>
 #include <ptScene.h>
+#include <gui.h>
+#include <glm/ext/matrix_transform.hpp>
 
 int main() {
 	Astra::DeviceCreateInfo createInfo{};
@@ -11,7 +13,7 @@ int main() {
 
 	Astra::Renderer* renderer = new Astra::Renderer();
 	Astra::Camera cam;
-	Astra::CameraController* cameraController = new Astra::OrbitCameraController(cam);
+	Astra::CameraController* cameraController = new Astra::FreeCameraController(cam);
 
 	Astra::SceneRT* scene = new PtScene();
 
@@ -20,14 +22,19 @@ int main() {
 
 	cameraController->setLookAt(glm::vec3(5, 1.5, 12), glm::vec3(0.0), glm::vec3(0, 1, 0));
 
-	//scene->loadModel(nvh::findFile("assets/casa_monos.obj", Astra::defaultSearchPaths));
 	scene->loadModel(nvh::findFile("assets/cornell.obj", Astra::defaultSearchPaths));
+	//scene->loadModel("C:\\Users\\pingu\\AstraExamples\\SceneEditor\\assets\\plane.obj");
+	//scene->loadModel(nvh::findFile("assets/bombilla.obj", Astra::defaultSearchPaths));
 	//scene->loadModel("C:\\Users\\pingu\\AstraExamples\\SceneEditor\\assets\\coche.obj");
+	//scene->loadModel(nvh::findFile("assets/streetlight.obj", Astra::defaultSearchPaths), glm::translate(glm::mat4(1.0f), glm::vec3(3.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), -3.14f/2.0f, glm::vec3(0.f, 1.f, 0.f)));
 	scene->addLight(lightBulb);
+
 	scene->setCamera(cameraController);
 
+	Astra::GuiController* gui = new PtGui();
+
 	try {
-		app.init({ scene }, renderer);
+		app.init({ scene }, renderer, gui);
 		app.run();
 	}
 	catch (const std::exception& exc) {
@@ -39,4 +46,5 @@ int main() {
 	delete renderer;
 	delete cameraController;
 	delete lightBulb;
+	delete gui;
 }
