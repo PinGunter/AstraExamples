@@ -26,6 +26,12 @@ layout(set = 1, binding = eLights) uniform _LightsUniform { LightsUniform lightU
 
 layout(push_constant) uniform _PushConstantRay { PushConstantRay pcRay; };
 
+float reflectance(float cosine, float refraction_index){
+	float r0 = (1.0f - refraction_index) / (1.0f + refraction_index);
+	r0 = r0 * r0;
+	return r0 + (1.0f - r0) * pow((1.0f - cosine), 5);
+}
+
 void main()
 {
 	// object data
@@ -76,6 +82,35 @@ void main()
 		if (mat.roughness > 0.0f)
 			rayDirection = normalize(rayDirection) + normalize(mat.roughness * samplingHemisphere(prd.seed, tangent, bitangent, worldNrm));
 		albedo *= mat.specular;
+	 }
+
+
+	 // refraction
+	 // we are gonna assume dielectric materials when illum==6
+	 if (mat.illum == 6){
+		vec3 hitNormal = worldNrm;
+        vec3 origin = worldPos;
+        float ior = 1.0 / mat.ior;
+        float ior_ratio;
+        albedo = vec3(1);
+        if (dot(gl_WorldRayDirectionEXT, hitNormal) > 0.0f){
+	        hitNormal *= -1;
+	        ior_ratio = 1.0f / ior;
+        } else{
+	        ior_ratio = ior;
+        }
+
+		float cos_theta_refr = min(dot(-gl_WorldRayDirectionEXT, hitNormal), 1.0f);
+		float sin_theta_refr = sqrt(1.0f - cos_theta_refr * cos_theta_refr);
+
+		bool cannot_refract = ior_ratio * sin_theta_refr > 1.0f;
+		
+		if (cannot_refract || reflectance(cos_theta_refr, ior_ratio) > rnd(prd.seed)){
+			rayDirection = reflect(gl_WorldRayDirectionEXT, hitNormal);
+		} else{
+			rayDirection = refract(gl_WorldRayDirectionEXT, hitNormal, ior_ratio);
+		}
+
 	 }
 
 	if (mat.textureId > -1){

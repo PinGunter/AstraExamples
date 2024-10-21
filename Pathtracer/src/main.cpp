@@ -22,11 +22,11 @@ int main() {
 
 	cameraController->setLookAt(glm::vec3(5, 1.5, 12), glm::vec3(0.0), glm::vec3(0, 1, 0));
 
-	scene->loadModel(nvh::findFile("assets/cornell.obj", Astra::defaultSearchPaths));
-	//scene->loadModel("C:\\Users\\pingu\\AstraExamples\\SceneEditor\\assets\\plane.obj");
+	//scene->loadModel(nvh::findFile("assets/cornell.obj", Astra::defaultSearchPaths));
+	scene->loadModel("C:\\Users\\pingu\\AstraExamples\\SceneEditor\\assets\\plane.obj");
 	//scene->loadModel(nvh::findFile("assets/bombilla.obj", Astra::defaultSearchPaths));
-	//scene->loadModel("C:\\Users\\pingu\\Downloads\\rungholt\\rungholt.obj");
-	//scene->loadModel(nvh::findFile("assets/streetlight.obj", Astra::defaultSearchPaths), glm::translate(glm::mat4(1.0f), glm::vec3(3.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), -3.14f/2.0f, glm::vec3(0.f, 1.f, 0.f)));
+	scene->loadModel("C:\\Users\\pingu\\AstraExamples\\SceneEditor\\assets\\mono_cristal.obj", glm::translate(glm::mat4(1.0f), glm::vec3(0.f, 1.f, 0.f)));;
+	scene->loadModel(nvh::findFile("assets/streetlight.obj", Astra::defaultSearchPaths), glm::translate(glm::mat4(1.0f), glm::vec3(3.0f, 0.0f, 0.0f)) * glm::rotate(glm::mat4(1.0f), -3.14f/2.0f, glm::vec3(0.f, 1.f, 0.f)));
 	scene->addLight(lightBulb);
 
 	scene->setCamera(cameraController);
